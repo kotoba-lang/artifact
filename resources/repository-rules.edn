@@ -6,5 +6,5 @@
  {:name "artifact"
   :tier :t0
   :role :contract
-  :must-not [:produce-artifacts :own-KIR :decide-policy]
-  :depends-on []}}
+  :must-not [:produce-artifacts :own-KIR :decide-policy :verify-that-is-kotoba-verifier-]
+  :depends-on ["kotoba-lang/kotoba-kir"]}}

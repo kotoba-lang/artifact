@@ -12,17 +12,17 @@ checkable from outside.
 
 - `kotoba.artifact.core (artifact digest/identity)`
 - `kotoba.artifact.runtime-identity (immutable execution identity)`
-- `kotoba.verifier.signing (signed artifact envelopes)`
 
 ## Does not own
 
 - produce artifacts
 - own KIR
 - decide policy
+- verify (that is kotoba-verifier)
 
 ## Depends on
 
-- nothing (contract/leaf tier)
+- `kotoba-lang/kotoba-kir`
 
 ## Test
 
