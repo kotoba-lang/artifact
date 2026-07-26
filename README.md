@@ -12,7 +12,7 @@ checkable from outside.
 
 - `kotoba.artifact.core (artifact digest/identity)`
 - `kotoba.artifact.runtime-identity (immutable execution identity)`
-- `kotoba.artifact.signing (signed artifact envelopes)`
+- `kotoba.verifier.signing (signed artifact envelopes)`
 
 ## Does not own
 
