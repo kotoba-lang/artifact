@@ -26,8 +26,14 @@
   then both indices must be code-point boundaries. It validates the source is
   canonical UTF-8 rather than assuming it, because over invalid UTF-8 \"not a
   continuation byte\" would not imply \"code-point boundary\", and a guest can
-  hand over any pair cell."
-  "9eccf1bb25137c4806ac28ce76f5944c5e0b2fe0c8f2b603ad926ab94de539a5")
+  hand over any pair cell.
+
+  Advanced 2026-08-04 again: adds checked_string_code_point_at at offset 144,
+  the operation that lets a guest WALK a string (its result determines the
+  code point's byte width, so one op advances). Same bounds discipline as
+  substring except the upper bound is exclusive -- no code point starts at the
+  end. Nothing is allocated: the result is a scalar, not a handle."
+  "a5aeea183b2e9a020ba895687372abcb51d8fd200c50c6ed28471693861b6ea0")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -40,8 +46,12 @@
   one was not -- it needs windows.h, and no cross-compiler is installed on the
   machine that made this change. Its offset was checked by reading the struct
   (allow[32] spans 16..48, every later field is a pointer), and its
-  _Static_assert will catch the layout on a real Windows build."
-  "402088f22a34b22a1f18b3c645610a1f1c12fb256e0c1fc68b9cb0413979d01d")
+  _Static_assert will catch the layout on a real Windows build.
+
+  Advanced 2026-08-04 again alongside the POSIX loader, with the same
+  string_code_point_at at offset 144. The same verification asymmetry applies:
+  compiled and executed for POSIX, read and reasoned about for Windows."
+  "a9f45989be794b97a4276f6ccb329885b3335fbe2783bc3f5e4825dbecc50a8d")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
