@@ -15,14 +15,33 @@
   now rules out overflow before adding, matching the order
   kexe_loader_windows.c's string_concat already used. Receipts naming the
   previous identity no longer verify against this loader -- that is the drift
-  detector behaving correctly, not a regression."
-  "a723dea1c8276f2432ccdc7f0c77341d4656aa866611d250cc2a596e3e0efaec")
+  detector behaving correctly, not a regression.
+
+  Advanced 2026-08-04: adds checked_string_substring at context offset 136,
+  which makes `string-substring` work on any string rather than only on an
+  all-ASCII literal (that case still compiles to pure pair arithmetic with no
+  host call). It allocates no string-pool bytes -- a substring is a contiguous
+  range of its source, so the result is a view -- and mirrors the shared
+  oracle kotoba.kir.value/utf8-substring!: bounds 0 <= start <= end <= length,
+  then both indices must be code-point boundaries. It validates the source is
+  canonical UTF-8 rather than assuming it, because over invalid UTF-8 \"not a
+  continuation byte\" would not imply \"code-point boundary\", and a guest can
+  hand over any pair cell."
+  "9eccf1bb25137c4806ac28ce76f5944c5e0b2fe0c8f2b603ad926ab94de539a5")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
   Includes the AppContainer denial boundary plus pair-backed string,
-  option-i64, and result-i64 typed capability validation."
-  "504de28c6ba3835318a0788402885a492857fe9a674df0ae88eb541bcfb111bb")
+  option-i64, and result-i64 typed capability validation.
+
+  Advanced 2026-08-04 alongside the POSIX loader, with the same
+  string_substring at offset 136 and the same checks. Note the asymmetry in
+  how the two were verified: the POSIX loader was compiled and executed, this
+  one was not -- it needs windows.h, and no cross-compiler is installed on the
+  machine that made this change. Its offset was checked by reading the struct
+  (allow[32] spans 16..48, every later field is a pointer), and its
+  _Static_assert will catch the layout on a real Windows build."
+  "402088f22a34b22a1f18b3c645610a1f1c12fb256e0c1fc68b9cb0413979d01d")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
