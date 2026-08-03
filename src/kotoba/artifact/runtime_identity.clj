@@ -6,8 +6,17 @@
   "Pinned identity of the reviewed POSIX native loader source.
   Includes string_equal/string_concat and the typed string capability
   callback, which validates pair-backed pointer/length handles and canonical
-  UTF-8 before and after the provider boundary."
-  "7f7950e9764e108986fd5050241a8588061ae869ab56f06ffe292b3f7c08f55f")
+  UTF-8 before and after the provider boundary.
+
+  Advanced 2026-08-03: checked_string_concat computed `length_a + length_b`
+  and tested the sum for `< 0` afterwards. Signed overflow is undefined, so
+  that test is one a compiler may assume unreachable and remove; the operands
+  come from guest-writable pair cells, which is why the function exists. It
+  now rules out overflow before adding, matching the order
+  kexe_loader_windows.c's string_concat already used. Receipts naming the
+  previous identity no longer verify against this loader -- that is the drift
+  detector behaving correctly, not a regression."
+  "a723dea1c8276f2432ccdc7f0c77341d4656aa866611d250cc2a596e3e0efaec")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
