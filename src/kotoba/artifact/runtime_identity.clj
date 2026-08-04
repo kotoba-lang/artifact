@@ -56,11 +56,13 @@
   checked_vector_assoc has no such case and always copies; checked_vector_drop
   allocates no elements at all, a suffix being contiguous within its source.
 
-  Advanced 2026-08-04 a fourth time: sanitizer-only builds receive 128 MiB of
-  address-space headroom so AddressSanitizer can map its shadow pages beside
-  the ABI v3 vector arena. Reviewed production builds retain the 64 MiB limit;
-  the conditional is enabled only by the sanitizer conformance harness."
-  "d9f630ca7863a9446b9ad63e010021d7de3a599e39701a7caacc91d2ee066b30")
+  Advanced 2026-08-04 a fourth time: sanitizer-only builds omit RLIMIT_AS so
+  AddressSanitizer can own its platform-dependent shadow address space beside
+  the ABI v3 vector arena. The first 128 MiB allowance proved insufficient on
+  native Linux ARM64. Reviewed production builds retain the 64 MiB limit; the
+  exception is enabled only by the sanitizer conformance harness, while the
+  guest arenas and all other process limits remain bounded."
+  "d2239f7d737a7509911826f09991d431e3401137a68f3831ec2c56ae8abf6d57")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
