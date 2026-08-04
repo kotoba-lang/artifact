@@ -32,8 +32,30 @@
   the operation that lets a guest WALK a string (its result determines the
   code point's byte width, so one op advances). Same bounds discipline as
   substring except the upper bound is exclusive -- no code point starts at the
-  end. Nothing is allocated: the result is a scalar, not a handle."
-  "a5aeea183b2e9a020ba895687372abcb51d8fd200c50c6ed28471693861b6ea0")
+  end. Nothing is allocated: the result is a scalar, not a handle.
+
+  Advanced 2026-08-04 a third time: the context ABI moves to VERSION 3, adding
+  the vector table at offsets 152-192 (ADR-2608030300). Unlike the two
+  advances above this one changes the version field, so receipts and artifacts
+  naming the previous identity do not merely fail to verify -- a v2 artifact is
+  refused by every checked_* in this loader, deliberately. The bump is
+  load-bearing in one direction: a v2 host has no slots at 152-192, so
+  v3-compiled code calling them would jump through uninitialised memory.
+
+  A vector value is a one-word handle into a host table, the same width and
+  discipline as the pair handle strings, options and results already use, so
+  the guest gains no new value representation. Two arenas back it, because a
+  table entry and the elements it spans are separately exhaustible.
+
+  The one non-obvious property is in checked_vector_conj: it appends in place
+  when the source slice ends at the arena top, and copies otherwise. That is
+  safe because every handle carries its own length, so the word past a slice
+  belongs to no handle and writing it cannot change what any existing handle
+  reads. It is what makes a conj chain -- which is how a vector literal is
+  built, the ABI being non-variadic -- linear rather than quadratic.
+  checked_vector_assoc has no such case and always copies; checked_vector_drop
+  allocates no elements at all, a suffix being contiguous within its source."
+  "25395a722e5ef4a1a8ad93f6242838f02b3c2dceb89bcaf4026253d90e659569")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -50,8 +72,19 @@
 
   Advanced 2026-08-04 again alongside the POSIX loader, with the same
   string_code_point_at at offset 144. The same verification asymmetry applies:
-  compiled and executed for POSIX, read and reasoned about for Windows."
-  "a9f45989be794b97a4276f6ccb329885b3335fbe2783bc3f5e4825dbecc50a8d")
+  compiled and executed for POSIX, read and reasoned about for Windows.
+
+  Advanced 2026-08-04 a third time alongside the POSIX loader: context ABI
+  version 3 and the same vector table at offsets 152-192, implemented to
+  mirror checked_vector_* line for line including the in-place append. The
+  verification asymmetry is unchanged and matters more here than for the
+  earlier advances, because this change adds ARITHMETIC (offset/length slice
+  bookkeeping) rather than another bounds check over an existing shape: the
+  POSIX half was compiled with -Wall -Wextra -Werror and executed against the
+  conformance vectors, this half was neither. Its _Static_asserts pin the six
+  offsets on a real Windows build, and the vector cells sit after string_pool
+  so no earlier offset moves."
+  "375d20aaa9009df40ab466da6f8be0142eda9e57b6d086a67eb92f9897e49f2f")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
