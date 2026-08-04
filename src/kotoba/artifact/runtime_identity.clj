@@ -54,8 +54,13 @@
   reads. It is what makes a conj chain -- which is how a vector literal is
   built, the ABI being non-variadic -- linear rather than quadratic.
   checked_vector_assoc has no such case and always copies; checked_vector_drop
-  allocates no elements at all, a suffix being contiguous within its source."
-  "25395a722e5ef4a1a8ad93f6242838f02b3c2dceb89bcaf4026253d90e659569")
+  allocates no elements at all, a suffix being contiguous within its source.
+
+  Advanced 2026-08-04 a fourth time: sanitizer-only builds receive 128 MiB of
+  address-space headroom so AddressSanitizer can map its shadow pages beside
+  the ABI v3 vector arena. Reviewed production builds retain the 64 MiB limit;
+  the conditional is enabled only by the sanitizer conformance harness."
+  "d9f630ca7863a9446b9ad63e010021d7de3a599e39701a7caacc91d2ee066b30")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
