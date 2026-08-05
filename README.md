@@ -12,6 +12,34 @@ checkable from outside.
 
 - `kotoba.artifact.core (artifact digest/identity)`
 - `kotoba.artifact.runtime-identity (immutable execution identity)`
+- `kotoba.artifact.descriptor-table (typed-value descriptors an artifact carries)`
+
+### The descriptor table
+
+A native artifact has no wasm custom section, so the sealed artifact map plays
+that role: it carries the typed-value descriptor table, so a loader can be
+handed a descriptor rather than the integer `kexe_typed_kind_v1` it is handed
+today. That integer is why every capability kit is still `:native-aot :pending`
+— `clock-v1`'s request is a variant and its result is a variant of records, and
+neither has an integer to be.
+
+Every descriptor byte comes from `kotoba.kir.descriptor/encode-descriptor`, the
+same function the wasm custom section calls. There is exactly one encoding of a
+descriptor by design (ADR-2608049000): two would look correct on both sides
+while disagreeing. What is local here is the *framing* — a version byte, a
+descriptor count, a contract region — because the wasm section additionally
+carries literals and schemas that a native loader has no use for. The tables
+themselves are index-compatible: index N denotes the same type in a wasm custom
+section and in a native artifact built from the same KIR.
+
+`:bytes-sha256` pins the encoding the producer ran. `validate!` re-encodes and
+compares, so a hand-edited artifact is refused and so is a verifier whose
+`encode-descriptor` has drifted from the producer's — the same drift detector
+`runtime-identity` applies to the loader source.
+
+This repo defines and validates what is carried. Emitting it from the compiler,
+and walking a value against it in the loader, are separate landings. **No
+capability kit is qualified by this: all remain `:native-aot :pending`.**
 
 ## Does not own
 
