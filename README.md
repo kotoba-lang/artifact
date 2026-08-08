@@ -13,6 +13,24 @@ checkable from outside.
 - `kotoba.artifact.core (artifact digest/identity)`
 - `kotoba.artifact.runtime-identity (immutable execution identity)`
 - `kotoba.artifact.descriptor-table (typed-value descriptors an artifact carries)`
+- `kotoba.artifact.content-identity (SourceCID, BuildCID, ArtifactCID)`
+
+## Content identity
+
+The four names are deliberately non-interchangeable:
+
+- SourceCID is CIDv1/raw over exact source or module bytes.
+- DefCID is owned by `kotoba.kir.identity` and addresses normalized checked
+  semantics, including type/effect/capability axes and dependency DefCID links.
+- BuildCID is CIDv1/DAG-CBOR over compiler, target, flags, and build links.
+- ArtifactCID is CIDv1/DAG-CBOR over a descriptor that links the raw artifact
+  bytes, DefCID, and BuildCID.
+
+EDN is the human/reference representation and JSON is an interop projection.
+Neither `pr-str` nor JSON serialization is a content-identity encoding. The
+existing `kotoba.artifact.core/sha256` remains a legacy integrity seal for
+already-published envelope shapes; new semantic/graph identities use the CID
+APIs above.
 
 ### The descriptor table
 
