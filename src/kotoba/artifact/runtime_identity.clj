@@ -69,14 +69,19 @@
   use the same bounded arenas and canonical UTF-8 validation. The loader also
   removes signed overflow from decoding the negative offset INT64_MIN.
 
-  Advanced 2026-08-11 again: follows the loader merged on Amu main and records
-  its Linux portability repair. The invalid-string trap now binds write(2)'s
-  result before explicitly discarding it, matching every neighbouring write
-  and satisfying fortified GCC builds with -Werror=unused-result; runtime
-  semantics are unchanged. The later scalar-record candidate remains pinned
-  by its immutable artifact commit and becomes canonical only when a matching
-  Amu loader is merged."
-  "32883db898d04d0fd197eeaf793e186987aa801f421f0b410adea214e3042426")
+  Advanced 2026-08-11 again: scalar records whose declared fields are only
+  i64/bool use the already-published declaration-order pair chain at the host
+  boundary. Input chains are allocated before guest entry; result chains are
+  walked for the exact field count and must end at terminator zero before any
+  field word is reported.
+
+  Advanced 2026-08-11 a third time: the public option-i64/result-i64 tagged
+  vectors cross as the existing canonical pair(tag,payload) handles. Ingress
+  allocates one checked pair and egress validates the handle, tag, signed word,
+  and option-none's required zero payload before reporting either value. All
+  direct stderr writes bind and discard write(2)'s result, retaining the Linux
+  fortified-GCC portability repair while adding these boundaries."
+  "e27104bab983d87ef5b103a49719bc02a28e392ebb70ededd6c65103ecbe529c")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -114,8 +119,11 @@
   it; no Windows qualification is claimed by the source hash alone.
 
   Advanced 2026-08-11 again alongside POSIX with the same bounded scalar-record
-  pair-chain ingress and exact-length/zero-terminator result inspection."
-  "e9718dda8621c91353dec6d69e7801bacf510779b9d4a72cad528c57a4377c02")
+  pair-chain ingress and exact-length/zero-terminator result inspection.
+
+  Advanced 2026-08-11 a third time alongside POSIX with the same canonical
+  option-i64/result-i64 tagged-pair ingress and inspected result egress."
+  "012bc57116bfc19d43e0909a8d1ca10bb064e0ba7b1210117b06c07f84802b9d")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
