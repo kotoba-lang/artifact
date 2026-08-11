@@ -23,6 +23,10 @@ support from an arena handle alone.
 The identity also includes the published scalar-record boundary: non-empty
 `:i64`/`:bool` records use declaration-order pair chains, with exact field
 count and zero terminator checked before result words leave the process.
+It likewise includes the established `:option-i64` / `:result-i64`
+`pair(tag,payload)` boundary. Host tagged vectors are copied into the pair
+arena, and selected results are validated and copied out before teardown;
+option none has the single canonical `(0,0)` representation.
 
 ### The descriptor table
 
