@@ -74,10 +74,10 @@
   boundary. Input chains are allocated before guest entry; result chains are
   walked for the exact field count and must end at terminator zero before any
   field word is reported. This matching merged loader also binds and discards
-  every direct write(2) result, including the invalid-string trap, retaining
-  fail-closed reporting while satisfying fortified Linux GCC builds with
-  -Werror=unused-result."
-  "a1b8e55705a5480c632dc0f0bb2bc3e7ff48d609dfaee129f6d31036ed5b1409")
+  every direct write(2) result across string/record trap reporting and the
+  macOS sandbox failure path, retaining fail-closed reporting while satisfying
+  fortified Linux GCC builds with -Werror=unused-result."
+  "eb1ef7fa63c88fe2f45f335d48c7e784f0d7acfdfd8760b6dcb82a0691cfe911")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
