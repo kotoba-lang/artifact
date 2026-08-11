@@ -80,8 +80,14 @@
   allocates one checked pair and egress validates the handle, tag, signed word,
   and option-none's required zero payload before reporting either value. All
   direct stderr writes bind and discard write(2)'s result, retaining the Linux
-  fortified-GCC portability repair while adding these boundaries."
-  "e27104bab983d87ef5b103a49719bc02a28e392ebb70ededd6c65103ecbe529c")
+  fortified-GCC portability repair while adding these boundaries.
+
+  Advanced 2026-08-11 a fourth time: scalar variant arguments use a bounded
+  token carrying case count, zero-based declaration ordinal, payload kind, and
+  word. Selected results carry a case-count/bool-mask profile; the supervisor
+  validates the pair handle, ordinal range, and 0/1 boolean payload before
+  copying ordinal and word into evidence."
+  "f93744ea32b4dc8c085813fc58e0d52ccf955393427dff9f7eb01c87ea6097c3")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -132,8 +138,13 @@
   private constants copied from Microsoft's win32metadata projection; native
   Windows SDK names remain authoritative on Windows. This is cross-build
   qualification, not execution qualification: AppContainer/WFP behavior and
-  option/result runtime vectors still require a Windows fleet node."
-  "2bfb0ff8cc19b5856c82cd86235e0eaaa0de8854054b8b46aeb317464aee6483")
+  option/result runtime vectors still require a Windows fleet node.
+
+  Advanced 2026-08-11 a fifth time: adds the scalar variant token and
+  case-count/bool-mask result inspection protocol in parity with POSIX. Both
+  Windows targets remain cross-build qualified; current Windows runtime
+  execution is still not claimed."
+  "ff30218fe4d2f5b4cb19ef373b5c93d167d34efe80ec78d047f64d1f054d6141")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
