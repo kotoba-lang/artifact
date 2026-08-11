@@ -122,8 +122,18 @@
   pair-chain ingress and exact-length/zero-terminator result inspection.
 
   Advanced 2026-08-11 a third time alongside POSIX with the same canonical
-  option-i64/result-i64 tagged-pair ingress and inspected result egress."
-  "012bc57116bfc19d43e0909a8d1ca10bb064e0ba7b1210117b06c07f84802b9d")
+  option-i64/result-i64 tagged-pair ingress and inspected result egress.
+
+  Advanced 2026-08-11 a fourth time: the source now compiles twice
+  byte-identically with Zig 0.15.2's Clang/MinGW path for both
+  x86_64-windows-gnu and aarch64-windows-gnu under -Wall -Wextra -Werror. The
+  outputs are independently parsed as PE32+ with machine fields 0x8664 and
+  0xaa64. MinGW's incomplete user-mode WFP declarations are bridged with
+  private constants copied from Microsoft's win32metadata projection; native
+  Windows SDK names remain authoritative on Windows. This is cross-build
+  qualification, not execution qualification: AppContainer/WFP behavior and
+  option/result runtime vectors still require a Windows fleet node."
+  "2bfb0ff8cc19b5856c82cd86235e0eaaa0de8854054b8b46aeb317464aee6483")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
