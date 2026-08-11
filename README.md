@@ -14,6 +14,12 @@ checkable from outside.
 - `kotoba.artifact.runtime-identity (immutable execution identity)`
 - `kotoba.artifact.descriptor-table (typed-value descriptors an artifact carries)`
 
+The runtime identity pins the reviewed loader source as well as the measured
+binary/toolchain closure. A loader that changes its process-boundary protocol
+therefore changes identity. The current identity includes bounded canonical
+UTF-8 host-string ingress and inspected string-result egress; it does not infer
+support from an arena handle alone.
+
 ### The descriptor table
 
 A native artifact has no wasm custom section, so the sealed artifact map plays

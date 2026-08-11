@@ -61,8 +61,14 @@
   the ABI v3 vector arena. The first 128 MiB allowance proved insufficient on
   native Linux ARM64. Reviewed production builds retain the 64 MiB limit; the
   exception is enabled only by the sanitizer conformance harness, while the
-  guest arenas and all other process limits remain bounded."
-  "d2239f7d737a7509911826f09991d431e3401137a68f3831ec2c56ae8abf6d57")
+  guest arenas and all other process limits remain bounded.
+
+  Advanced 2026-08-11: the structured-report protocol can copy a selected
+  `:string` export result out of the pair/string arenas as independently
+  validated UTF-8 hex before those arenas are unmapped. Host string arguments
+  use the same bounded arenas and canonical UTF-8 validation. The loader also
+  removes signed overflow from decoding the negative offset INT64_MIN."
+  "f536c91ed90206933f54c02c41096065028d05528e27a6deebff233045977e9f")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -90,8 +96,15 @@
   POSIX half was compiled with -Wall -Wextra -Werror and executed against the
   conformance vectors, this half was neither. Its _Static_asserts pin the six
   offsets on a real Windows build, and the vector cells sit after string_pool
-  so no earlier offset moves."
-  "375d20aaa9009df40ab466da6f8be0142eda9e57b6d086a67eb92f9897e49f2f")
+  so no earlier offset moves.
+
+  Advanced 2026-08-11 alongside POSIX: host strings are decoded into the
+  existing pool before guest entry and selected string results are copied into
+  the structured report before zero/free. The source mirrors the same strict
+  hex, UTF-8, handle, allocated-slice, and INT64_MIN-safe offset checks. This
+  source was reviewed but remains unexecuted until a Windows fleet node runs
+  it; no Windows qualification is claimed by the source hash alone."
+  "e7149090bb52de0baface59c2026a799e7358d8f9a5d3324a8373f5241ec9979")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
