@@ -69,12 +69,14 @@
   use the same bounded arenas and canonical UTF-8 validation. The loader also
   removes signed overflow from decoding the negative offset INT64_MIN.
 
-  Advanced 2026-08-11 again: scalar records whose declared fields are only
-  i64/bool use the already-published declaration-order pair chain at the host
-  boundary. Input chains are allocated before guest entry; result chains are
-  walked for the exact field count and must end at terminator zero before any
-  field word is reported."
-  "be07e1cb5d67130c8bc6826923ba5690a5c437158be4bee3fb983cae309ae68c")
+  Advanced 2026-08-11 again: follows the loader merged on Amu main and records
+  its Linux portability repair. The invalid-string trap now binds write(2)'s
+  result before explicitly discarding it, matching every neighbouring write
+  and satisfying fortified GCC builds with -Werror=unused-result; runtime
+  semantics are unchanged. The later scalar-record candidate remains pinned
+  by its immutable artifact commit and becomes canonical only when a matching
+  Amu loader is merged."
+  "32883db898d04d0fd197eeaf793e186987aa801f421f0b410adea214e3042426")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
