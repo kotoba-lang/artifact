@@ -20,6 +20,10 @@ therefore changes identity. The current identity includes bounded canonical
 UTF-8 host-string ingress and inspected string-result egress; it does not infer
 support from an arena handle alone.
 
+The identity also includes the published scalar-record boundary: non-empty
+`:i64`/`:bool` records use declaration-order pair chains, with exact field
+count and zero terminator checked before result words leave the process.
+
 ### The descriptor table
 
 A native artifact has no wasm custom section, so the sealed artifact map plays
