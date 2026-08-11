@@ -67,8 +67,14 @@
   `:string` export result out of the pair/string arenas as independently
   validated UTF-8 hex before those arenas are unmapped. Host string arguments
   use the same bounded arenas and canonical UTF-8 validation. The loader also
-  removes signed overflow from decoding the negative offset INT64_MIN."
-  "f536c91ed90206933f54c02c41096065028d05528e27a6deebff233045977e9f")
+  removes signed overflow from decoding the negative offset INT64_MIN.
+
+  Advanced 2026-08-11 again: scalar records whose declared fields are only
+  i64/bool use the already-published declaration-order pair chain at the host
+  boundary. Input chains are allocated before guest entry; result chains are
+  walked for the exact field count and must end at terminator zero before any
+  field word is reported."
+  "be07e1cb5d67130c8bc6826923ba5690a5c437158be4bee3fb983cae309ae68c")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -103,8 +109,11 @@
   the structured report before zero/free. The source mirrors the same strict
   hex, UTF-8, handle, allocated-slice, and INT64_MIN-safe offset checks. This
   source was reviewed but remains unexecuted until a Windows fleet node runs
-  it; no Windows qualification is claimed by the source hash alone."
-  "e7149090bb52de0baface59c2026a799e7358d8f9a5d3324a8373f5241ec9979")
+  it; no Windows qualification is claimed by the source hash alone.
+
+  Advanced 2026-08-11 again alongside POSIX with the same bounded scalar-record
+  pair-chain ingress and exact-length/zero-terminator result inspection."
+  "e9718dda8621c91353dec6d69e7801bacf510779b9d4a72cad528c57a4377c02")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
