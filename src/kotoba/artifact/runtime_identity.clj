@@ -73,15 +73,11 @@
   i64/bool use the already-published declaration-order pair chain at the host
   boundary. Input chains are allocated before guest entry; result chains are
   walked for the exact field count and must end at terminator zero before any
-  field word is reported.
-
-  Advanced 2026-08-11 a third time: the public option-i64/result-i64 tagged
-  vectors cross as the existing canonical pair(tag,payload) handles. Ingress
-  allocates one checked pair and egress validates the handle, tag, signed word,
-  and option-none's required zero payload before reporting either value. All
-  direct stderr writes bind and discard write(2)'s result, retaining the Linux
-  fortified-GCC portability repair while adding these boundaries."
-  "e27104bab983d87ef5b103a49719bc02a28e392ebb70ededd6c65103ecbe529c")
+  field word is reported. This matching merged loader also binds and discards
+  every direct write(2) result, including the invalid-string trap, retaining
+  fail-closed reporting while satisfying fortified Linux GCC builds with
+  -Werror=unused-result."
+  "a1b8e55705a5480c632dc0f0bb2bc3e7ff48d609dfaee129f6d31036ed5b1409")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
