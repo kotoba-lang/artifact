@@ -86,8 +86,15 @@
   token carrying case count, zero-based declaration ordinal, payload kind, and
   word. Selected results carry a case-count/bool-mask profile; the supervisor
   validates the pair handle, ordinal range, and 0/1 boolean payload before
-  copying ordinal and word into evidence."
-  "f93744ea32b4dc8c085813fc58e0d52ccf955393427dff9f7eb01c87ea6097c3")
+  copying ordinal and word into evidence.
+
+  Advanced 2026-08-15: typed capability kind 4 is the hosted clock-v1
+  oracle. Identity is refused for that kind; the host decodes the nested
+  request pair, reads CLOCK_REALTIME / CLOCK_MONOTONIC, and encodes wall or
+  monotonic records with a process-local observation sequence. Linux seccomp
+  allows clock_gettime; macOS seatbelt allows sysctl-read. This is not the
+  C-free aiueos production surface."
+  "0c60050116b3a65f33d88a3e4c05f3647244380bfe8601cb2a5e779e7e2dcf33")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -143,8 +150,12 @@
   Advanced 2026-08-11 a fifth time: adds the scalar variant token and
   case-count/bool-mask result inspection protocol in parity with POSIX. Both
   Windows targets remain cross-build qualified; current Windows runtime
-  execution is still not claimed."
-  "ff30218fe4d2f5b4cb19ef373b5c93d167d34efe80ec78d047f64d1f054d6141")
+  execution is still not claimed.
+
+  Advanced 2026-08-15: same hosted clock-v1 oracle as POSIX (kind 4, cap 7),
+  using GetSystemTimeAsFileTime and QueryPerformanceCounter. Source reviewed
+  in parity; Windows execution is still not claimed by the hash alone."
+  "c8de65d259fe6f7adb636f89f98b87c1e1e9838aa3572af6ca43f388c1040ed2")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
