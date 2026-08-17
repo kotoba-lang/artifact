@@ -86,8 +86,15 @@
   token carrying case count, zero-based declaration ordinal, payload kind, and
   word. Selected results carry a case-count/bool-mask profile; the supervisor
   validates the pair handle, ordinal range, and 0/1 boolean payload before
-  copying ordinal and word into evidence."
-  "f93744ea32b4dc8c085813fc58e0d52ccf955393427dff9f7eb01c87ea6097c3")
+  copying ordinal and word into evidence.
+
+  Advanced 2026-08-17: typed callback kind 5 is dataspace-v1. Cap 24 is no
+  longer identity: the loader validates the request variant, runs a bounded
+  in-process inject (facet-enter / assert / observe / retract / facet-leave),
+  and interns notice documents as UTF-8 EDN pair handles. Native `:document`
+  stays a string-shaped pair; this is a loader identity change, not a context
+  ABI change."
+  "fe3b997f31581e2ed404dcaf4b0813ccdfde38b08357802998f014b536e8d3bf")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
