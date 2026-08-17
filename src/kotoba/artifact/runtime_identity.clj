@@ -93,8 +93,14 @@
   in-process inject (facet-enter / assert / observe / retract / facet-leave),
   and interns notice documents as UTF-8 EDN pair handles. Native `:document`
   stays a string-shaped pair; this is a loader identity change, not a context
-  ABI change."
-  "fe3b997f31581e2ed404dcaf4b0813ccdfde38b08357802998f014b536e8d3bf")
+  ABI change.
+
+  Advanced 2026-08-17 again: dataspace request/result predicates peek pair
+  cells and string bytes without SIGILL. A retracted result is
+  pair(1, pair(count, 0)) and looks like a retract request until the
+  terminator is walked; checked_pair_get on that 0 aborted a real guest
+  after retract. Validators are predicates, not traps."
+  "f28b175fd240f542bae9ea45b8942066d57b5e820572d7e6b0b2496c201d4d3f")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
