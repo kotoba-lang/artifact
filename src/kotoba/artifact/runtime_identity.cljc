@@ -99,8 +99,19 @@
   cells and string bytes without SIGILL. A retracted result is
   pair(1, pair(count, 0)) and looks like a retract request until the
   terminator is walked; checked_pair_get on that 0 aborted a real guest
-  after retract. Validators are predicates, not traps."
-  "f28b175fd240f542bae9ea45b8942066d57b5e820572d7e6b0b2496c201d4d3f")
+  after retract. Validators are predicates, not traps.
+
+  Advanced 2026-08-24: typed capability kind 4 is the hosted clock-v1 oracle.
+  The host decodes the nested request pair, reads CLOCK_REALTIME /
+  CLOCK_MONOTONIC, and encodes wall or monotonic records with a process-local
+  observation sequence; kind 4 also joins `valid_typed_value`, so a clock
+  request no longer traps in request validation. Linux seccomp allows
+  clock_gettime, macOS seatbelt allows sysctl-read. This is an ORACLE, not the
+  C-free aiueos production surface (amu ADR 0271); production :native-aot stays
+  pending. The hash is of the loader as it stands with BOTH the clock oracle
+  and the dataspace provider present -- it is neither side of that merge taken
+  alone, which is why it matches no earlier proposal."
+  "bea13f88ebbc95e84fb13117bb2c4c68f199607760f41d4b430ec518223cfcd5")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -156,8 +167,13 @@
   Advanced 2026-08-11 a fifth time: adds the scalar variant token and
   case-count/bool-mask result inspection protocol in parity with POSIX. Both
   Windows targets remain cross-build qualified; current Windows runtime
-  execution is still not claimed."
-  "ff30218fe4d2f5b4cb19ef373b5c93d167d34efe80ec78d047f64d1f054d6141")
+  execution is still not claimed.
+
+  Advanced 2026-08-24: the same hosted clock-v1 oracle as POSIX (kind 4,
+  capability 7), using GetSystemTimeAsFileTime and QueryPerformanceCounter.
+  Source reviewed in parity; Windows execution is still not claimed by the
+  hash alone."
+  "c8de65d259fe6f7adb636f89f98b87c1e1e9838aa3572af6ca43f388c1040ed2")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
