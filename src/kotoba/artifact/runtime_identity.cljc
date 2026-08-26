@@ -110,8 +110,18 @@
   C-free aiueos production surface (amu ADR 0271); production :native-aot stays
   pending. The hash is of the loader as it stands with BOTH the clock oracle
   and the dataspace provider present -- it is neither side of that merge taken
-  alone, which is why it matches no earlier proposal."
-  "bea13f88ebbc95e84fb13117bb2c4c68f199607760f41d4b430ec518223cfcd5")
+  alone, which is why it matches no earlier proposal.
+
+  Advanced 2026-08-26: typed capability kinds 6 and 7 are ui-commit-v1 and
+  ui-event-v1. Caps 9 and 10 are no longer identity: the loader validates the
+  commit request (base revision plus a vector of node records) and the event
+  request (after-revision), runs a bounded in-process inject (CAS on
+  base_rev == ui_revision, one auto-enqueued :ui/committed event from the
+  first node, poll none = pair(0,0) / some = pair(1, event-record)), and
+  peeks pair cells without SIGILL. Native :set of UI records is the existing
+  vector host table. Windows omits UI, same as dataspace. This is a hosted
+  kexe process proof (amu ADR 0272), not C-free aiueos."
+  "b1d88371fedf6b8165ad091255b3374b077e7f548d6512ff73d59e4b6c677561")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
