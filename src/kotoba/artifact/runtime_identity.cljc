@@ -120,8 +120,14 @@
   first node, poll none = pair(0,0) / some = pair(1, event-record)), and
   peeks pair cells without SIGILL. Native :set of UI records is the existing
   vector host table. Windows omits UI, same as dataspace. This is a hosted
-  kexe process proof (amu ADR 0272), not C-free aiueos."
-  "b1d88371fedf6b8165ad091255b3374b077e7f548d6512ff73d59e4b6c677561")
+  kexe process proof (amu ADR 0272), not C-free aiueos.
+
+  Advanced 2026-08-30: checked string equality compares 16-byte chunks through
+  explicit AArch64 NEON or x86 SSE2 instructions, with a bounded scalar tail.
+  The callback ABI, UTF-8 validity checks, and result meaning are unchanged;
+  only the reviewed POSIX loader implementation changes. Windows remains on
+  its separately pinned source until it is implemented and qualified there."
+  "e1f32ab97329b2cf1cbb7bebbf35ded29b5b42542ae6bfd1dcc02c3ae9ece0b5")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
