@@ -126,8 +126,23 @@
   explicit AArch64 NEON or x86 SSE2 instructions, with a bounded scalar tail.
   The callback ABI, UTF-8 validity checks, and result meaning are unchanged;
   only the reviewed POSIX loader implementation changes. Windows remains on
-  its separately pinned source until it is implemented and qualified there."
-  "e1f32ab97329b2cf1cbb7bebbf35ded29b5b42542ae6bfd1dcc02c3ae9ece0b5")
+  its separately pinned source until it is implemented and qualified there.
+
+  Advanced 2026-08-31: per-handle UTF-8 validation memoisation
+  (pair_validated). substring, code-point-at and read_string_handle
+  previously ran valid_utf8 over the WHOLE string on every access --
+  O(n^2) for a scan; they now validate once per handle. Sound because a
+  handle's bytes never change after minting (code+literal data is
+  read-only, the string pool is append-only): every mint clears its flag,
+  the s: argument parse mints pre-validated (it has just validated those
+  bytes), a code-point-bounded substring view of a validated string is
+  marked valid by construction, and concat marks its result only when
+  both inputs were validated. No trap is removed -- an unvalidated handle
+  still validates, and traps on bad bytes, at first access. Measured on
+  the benchmark twin of this change: the strings kernel's amu arm fell
+  from 5427 to 1156 ns/call (amu docs/codegen-coscientist.md,
+  iteration 54)."
+  "636ba814db0fc0696fee6db8f83c568413fb677241894eb67e4b02f373dc0946")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -188,8 +203,16 @@
   Advanced 2026-08-24: the same hosted clock-v1 oracle as POSIX (kind 4,
   capability 7), using GetSystemTimeAsFileTime and QueryPerformanceCounter.
   Source reviewed in parity; Windows execution is still not claimed by the
+  hash alone.
+
+  Advanced 2026-08-31 alongside the POSIX loader: the same per-handle
+  UTF-8 validation memoisation (pair_validated on struct kexe_context),
+  the same mint-clears/parse-pre-validates/view-and-concat-propagate
+  rules, and valid_typed_value's string arm reads the same cache. The
+  POSIX twin was compiled and measured; this source was ported
+  mechanically and, as before, Windows execution is not claimed by the
   hash alone."
-  "c8de65d259fe6f7adb636f89f98b87c1e1e9838aa3572af6ca43f388c1040ed2")
+  "43cb3591c6d3248f597324e7804e84b9a64cd14a8256b60c764262aee8827765")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
