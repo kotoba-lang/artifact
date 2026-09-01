@@ -255,14 +255,19 @@
 
   Advanced 2026-09-01 alongside the POSIX loader: the same context ABI
   version 4, the same `vector_alloc` at 200 and `vector_assoc_in_place` at
-  208, ported line for line. The verification asymmetry is the same one every
-  entry above records, and is worth restating for this change because the
-  in-place store is the one vector operation that writes inside an existing
-  slice: the POSIX twin was compiled with -Wall -Wextra -Werror and executed
-  against a real kexe process on aarch64-apple-darwin, this source was read
-  and ported. Its two new `_Static_assert`s pin offsets 200 and 208 on a real
-  Windows build, and both fields sit after `vector_drop`, so no earlier offset
-  moves. Windows execution is not claimed by the hash alone."
+  208. Both new fields sit after `vector_drop`, so no earlier offset moves.
+
+  Cross-build qualified, not execution qualified, and the difference matters
+  more for this advance than for a bounds check because the in-place store is
+  the one vector operation that writes inside an existing slice. The source
+  compiles reproducibly under Zig 0.15.2's Clang/MinGW path for both
+  x86_64-windows-gnu (199680 bytes) and aarch64-windows-gnu (185856 bytes)
+  with -Wall -Wextra -Werror, which is what actually evaluates the two new
+  `_Static_assert`s at 200 and 208 on a real Windows toolchain rather than
+  leaving them to be discovered later. What is still NOT claimed is
+  execution: the POSIX twin was run against a real kexe process on
+  aarch64-apple-darwin and on x86_64 under Rosetta, and no Windows fleet node
+  has run this one."
   "f10a99e4cd348de75f025ee79dc4a2de580160197c1162ccd7e693ac64ddfde7")
 
 (defn loader-source-for-profile [profile]
