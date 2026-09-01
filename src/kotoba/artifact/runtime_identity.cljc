@@ -141,8 +141,48 @@
   still validates, and traps on bad bytes, at first access. Measured on
   the benchmark twin of this change: the strings kernel's amu arm fell
   from 5427 to 1156 ns/call (amu docs/codegen-coscientist.md,
-  iteration 54)."
-  "636ba814db0fc0696fee6db8f83c568413fb677241894eb67e4b02f373dc0946")
+  iteration 54).
+
+  Advanced 2026-09-01: the context ABI moves to VERSION 4, adding
+  `vector_alloc` at offset 200 and `vector_assoc_in_place` at 208
+  (superproject ADR-2609010200). Like the v2 -> v3 bump and unlike every
+  advance between them, this changes the version field, so a v3 artifact is
+  not merely unable to find the new slots -- it is refused by every
+  `checked_*` in this loader, and by `kotoba.verifier`'s expected context ABI
+  before that. The bump is load-bearing in one direction: a v3 host has no
+  slots at 200-208, so v4-compiled code calling them would jump through
+  uninitialised memory.
+
+  `vector_alloc` is n zero words in one call. `vector-new` is variadic -- its
+  arity IS the literal's element count -- so a struct of arrays with a million
+  slots would need a million arguments in source, and the literal limit
+  refuses that long before the item limit does. Correct, and it left no way to
+  allocate one at all.
+
+  `vector_assoc_in_place` is `checked_vector_assoc` lowered to a STORE: it
+  writes one word inside the slice its handle already covers and returns THE
+  SAME handle, where the copying twin memmoves the whole vector and
+  bump-allocates. The saving is not constant-factor. The arena is bump-only
+  and never reclaimed, so copying caps a vector's whole-program write count at
+  `arena / length` -- four writes for a 16384-item vector.
+
+  This is the one place in the vector table that writes inside a slice an
+  existing handle could cover, so read it beside `checked_vector_assoc`: the
+  write is legal exactly when no other LIVE handle spans the word, and the
+  loader does not check that. It checks memory safety unconditionally (the
+  handle resolves, the index is inside the slice's own length); the aliasing
+  claim is the compiler's, discharged by `kotoba.compiler.affine/linear?`
+  behind kotoba-sema's `check-affine-writes!`, which refuses `vector-assoc!`
+  on a handle it cannot prove dead. A host-side alias check would have to walk
+  the handle table on every write, which is the O(length) cost this slot
+  exists to remove.
+
+  The two arena bounds are UNCHANGED (4096 handles, 65536 words, 16384 items).
+  Removing the copy removes the reason the element arena had to be four
+  vectors wide, but raising a bound is a separate decision with its own
+  fail-closed argument and has not been made. Compiled with -Wall -Wextra
+  -Werror and executed on aarch64-apple-darwin against a real kexe process."
+  "155cf3421a030428a482a13725c93447a68869b06cd3a9c77a5c22a1de3747af")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -211,8 +251,19 @@
   rules, and valid_typed_value's string arm reads the same cache. The
   POSIX twin was compiled and measured; this source was ported
   mechanically and, as before, Windows execution is not claimed by the
-  hash alone."
-  "43cb3591c6d3248f597324e7804e84b9a64cd14a8256b60c764262aee8827765")
+  hash alone.
+
+  Advanced 2026-09-01 alongside the POSIX loader: the same context ABI
+  version 4, the same `vector_alloc` at 200 and `vector_assoc_in_place` at
+  208, ported line for line. The verification asymmetry is the same one every
+  entry above records, and is worth restating for this change because the
+  in-place store is the one vector operation that writes inside an existing
+  slice: the POSIX twin was compiled with -Wall -Wextra -Werror and executed
+  against a real kexe process on aarch64-apple-darwin, this source was read
+  and ported. Its two new `_Static_assert`s pin offsets 200 and 208 on a real
+  Windows build, and both fields sit after `vector_drop`, so no earlier offset
+  moves. Windows execution is not claimed by the hash alone."
+  "f10a99e4cd348de75f025ee79dc4a2de580160197c1162ccd7e693ac64ddfde7")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
