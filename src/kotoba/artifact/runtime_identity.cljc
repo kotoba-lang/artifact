@@ -183,12 +183,12 @@
   fail-closed argument and has not been made. Compiled with -Wall -Wextra
   -Werror and executed on aarch64-apple-darwin against a real kexe process.
 
-  Advanced 2026-09-05 (kbb slice 4): adds env_read_provider at the typed string
+  Advanced 2026-09-05 (kbb slice 4, second): adds fs_app_data_read_provider at the typed string capability dispatch (wire id 35, :fs/app-data) - a real read. The request string is an absolute path resolved with realpath and admitted only when it matches a KEXE_CAP_RESOURCES_35 scope entry (exact or directory-prefix); the macOS Seatbelt profile now allows file-read* for the provider; scope breach, empty scope, or malformed requests fail closed with SIGILL. Also adds env_read_provider at the typed string capability dispatch (wire id 33, :env/read) - a real getenv.
   capability dispatch (wire id 33, :env/read) - a real getenv. The request
   string is the variable NAME (NUL-terminated, 4096-byte bound, an equals sign
   rejected fail-closed), unset names return the empty string handle, and the
   deny path still traps before any lookup."
-  "99fd0d32965ee58c4a0966d778675e7557660c8c2558d3b62e16238b5460b771")
+  "3eb798d8d5cd820ac841bf6cafa4ae80279f20e41e1d416df0c39f30bcb919f0")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
