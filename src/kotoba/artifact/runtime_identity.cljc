@@ -181,8 +181,14 @@
   Removing the copy removes the reason the element arena had to be four
   vectors wide, but raising a bound is a separate decision with its own
   fail-closed argument and has not been made. Compiled with -Wall -Wextra
-  -Werror and executed on aarch64-apple-darwin against a real kexe process."
-  "155cf3421a030428a482a13725c93447a68869b06cd3a9c77a5c22a1de3747af")
+  -Werror and executed on aarch64-apple-darwin against a real kexe process.
+
+  Advanced 2026-09-05 (kbb slice 4): adds env_read_provider at the typed string
+  capability dispatch (wire id 33, :env/read) - a real getenv. The request
+  string is the variable NAME (NUL-terminated, 4096-byte bound, "=" rejected
+  fail-closed), unset names return the empty string handle, and the deny path
+  still traps before any lookup."
+  "99fd0d32965ee58c4a0966d778675e7557660c8c2558d3b62e16238b5460b771")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
