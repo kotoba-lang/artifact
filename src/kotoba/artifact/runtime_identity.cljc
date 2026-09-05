@@ -185,9 +185,9 @@
 
   Advanced 2026-09-05 (kbb slice 4): adds env_read_provider at the typed string
   capability dispatch (wire id 33, :env/read) - a real getenv. The request
-  string is the variable NAME (NUL-terminated, 4096-byte bound, "=" rejected
-  fail-closed), unset names return the empty string handle, and the deny path
-  still traps before any lookup."
+  string is the variable NAME (NUL-terminated, 4096-byte bound, an equals sign
+  rejected fail-closed), unset names return the empty string handle, and the
+  deny path still traps before any lookup."
   "99fd0d32965ee58c4a0966d778675e7557660c8c2558d3b62e16238b5460b771")
 
 (def windows-loader-source-sha256
