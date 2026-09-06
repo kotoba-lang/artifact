@@ -188,7 +188,7 @@
   string is the variable NAME (NUL-terminated, 4096-byte bound, an equals sign
   rejected fail-closed), unset names return the empty string handle, and the
   deny path still traps before any lookup."
-  "ed2af9957c6754fd19e24afe6c39663dc40707f0c1d7edee6b01d3b73f4be1fe")
+  "7fa77cae7fd2a6ed62f599fecfa71c09531f4e9dee0b516bc7aa12ad2dcc12fe")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
