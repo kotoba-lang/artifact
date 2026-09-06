@@ -183,12 +183,12 @@
   fail-closed argument and has not been made. Compiled with -Wall -Wextra
   -Werror and executed on aarch64-apple-darwin against a real kexe process.
 
-  Advanced 2026-09-05 (kbb slice 4, second): adds fs_app_data_read_provider at the typed string capability dispatch (wire id 35, :fs/app-data) - a real read. The request string is an absolute path resolved with realpath and admitted only when it matches a KEXE_CAP_RESOURCES_35 scope entry (exact or directory-prefix); the macOS Seatbelt profile now allows file-read* for the provider; scope breach, empty scope, or malformed requests fail closed with SIGILL. Also adds env_read_provider at the typed string capability dispatch (wire id 33, :env/read) - a real getenv.
+  Advanced 2026-09-05 (kbb slice 4, third): the fs/app-data scope is resolved in the loader parent before fork (realpath per entry), the Seatbelt profile grants file-read* only as (subpath <resolved-entry>), and the provider matches the guest path lexically against both the granted and the resolved spelling, re-spelling the open target under the resolved entry and verifying the opened fd with F_GETPATH. Prior: adds fs_app_data_read_provider at the typed string capability dispatch (wire id 35, :fs/app-data) - a real read. The request string is an absolute path resolved with realpath and admitted only when it matches a KEXE_CAP_RESOURCES_35 scope entry (exact or directory-prefix); the macOS Seatbelt profile now allows file-read* for the provider; scope breach, empty scope, or malformed requests fail closed with SIGILL. Also adds env_read_provider at the typed string capability dispatch (wire id 33, :env/read) - a real getenv.
   capability dispatch (wire id 33, :env/read) - a real getenv. The request
   string is the variable NAME (NUL-terminated, 4096-byte bound, an equals sign
   rejected fail-closed), unset names return the empty string handle, and the
   deny path still traps before any lookup."
-  "3eb798d8d5cd820ac841bf6cafa4ae80279f20e41e1d416df0c39f30bcb919f0")
+  "8b55e8de3553b78e11d7bd4129ba0e6969010c8c6c7612ebb22732f7de6b9e55")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
