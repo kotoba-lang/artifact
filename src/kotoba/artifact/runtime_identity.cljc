@@ -187,8 +187,27 @@
   capability dispatch (wire id 33, :env/read) - a real getenv. The request
   string is the variable NAME (NUL-terminated, 4096-byte bound, an equals sign
   rejected fail-closed), unset names return the empty string handle, and the
-  deny path still traps before any lookup."
-  "ddb36e5b79232d80b79d759f7680e6ccd4f965adaf20aca3bb0468b29eb56575")
+  deny path still traps before any lookup.
+
+  Advanced 2026-09-07 (kbb native gaps, amu branch e18-kbb-native-gaps, base
+  f57e8142): three changes, one identity. (1) The fuel budget is read from
+  KEXE_FUEL (positive decimal, absent = 512) and the structured report prints
+  the budget that was in force; zero, negative or non-decimal budgets are
+  refused with exit 2 before the guest starts. RLIMIT_CPU and the supervisor
+  alarm are unchanged. (2) wire id 34 (:fs/browse) has a real provider: one
+  absolute directory inside KEXE_CAP_RESOURCES_34 -> entry names sorted
+  bytewise, newline-joined, dot and dot-dot excluded; O_DIRECTORY|O_NOFOLLOW,
+  contained like a file, bounded at 4096 names and the string pool; Seatbelt
+  file-read* and seccomp getdents64 + fcntl(F_GETFL only) are admitted only
+  when that scope is set. The two wire-35 providers' scope checks became one
+  struct kexe_scope with init / admit / contains-fd helpers, behaviour
+  unchanged. (3) wire id 35 gains the range form
+  <path>RANGE_SEP<offset>:<length>: exactly that window of a file, refused
+  (SIGILL) when it leaves the file, exceeds the pool, cuts a code point (the
+  typed dispatch's UTF-8 check), or names the token twice. Measured on
+  aarch64-apple-darwin against the real kexe process and under ASan/UBSan;
+  the Linux seccomp path compiled, not executed."
+  "a2b6d308bc539b1367f265cbb8bb421ee09a798305f1c46828accf81d1a6c495")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
