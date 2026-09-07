@@ -2,8 +2,8 @@
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
         io.github.kotoba-lang/io-ipld
         {:git/sha "5d8de535ebc2c10bb90a671ea6019783ecbd2137"}
-        io.github.kotoba-lang/kotoba-kir
-        {:git/url "https://github.com/kotoba-lang/kotoba-kir.git"
+        io.github.kotoba-lang/osaho
+        {:git/url "https://github.com/kotoba-lang/osaho.git"
          :git/sha "a54916bca005f9df5419190c6506d44adcd0311e"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {io.github.cognitect-labs/test-runner
