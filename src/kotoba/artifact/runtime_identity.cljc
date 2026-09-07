@@ -210,8 +210,14 @@
   day: GCC on the Linux CI hosts refused the source with -Wunused-parameter
   (`scope` is consulted through `candidate` in the dev/ino containment
   branch, which clang on macOS never compiled); a `(void)scope;` there,
-  no behaviour change."
-  "eec48a659c1eb8f4f8eaf1716b439f6e47ed6fa0210c80270b31d8fdbd5a2b08")
+  no behaviour change. And a third time: on Linux the wire-34 listing is
+  read with the raw getdents64 syscall instead of libc's DIR -- glibc's
+  fdopendir issues fcntl(F_SETFD, FD_CLOEXEC), which the seccomp filter
+  trapped (measured with strace on glibc 2.39); the fcntl filter rule is
+  gone, getdents64 stays admitted only with a wire-34 scope. Measured on
+  a Linux x86_64 host with gcc -Werror: listing byte-exact, refusals
+  SIGILL, probes SIGSYS, read/range/fuel unchanged."
+  "147b0344fabaedc9cc9740f7ab87a785344f6b074a39ebca69ac8f256433a3a0")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
