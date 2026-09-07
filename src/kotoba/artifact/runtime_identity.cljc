@@ -206,8 +206,12 @@
   (SIGILL) when it leaves the file, exceeds the pool, cuts a code point (the
   typed dispatch's UTF-8 check), or names the token twice. Measured on
   aarch64-apple-darwin against the real kexe process and under ASan/UBSan;
-  the Linux seccomp path compiled, not executed."
-  "a2b6d308bc539b1367f265cbb8bb421ee09a798305f1c46828accf81d1a6c495")
+  the Linux seccomp path compiled, not executed. Advanced once more the same
+  day: GCC on the Linux CI hosts refused the source with -Wunused-parameter
+  (`scope` is consulted through `candidate` in the dev/ino containment
+  branch, which clang on macOS never compiled); a `(void)scope;` there,
+  no behaviour change."
+  "eec48a659c1eb8f4f8eaf1716b439f6e47ed6fa0210c80270b31d8fdbd5a2b08")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
