@@ -216,8 +216,44 @@
   trapped (measured with strace on glibc 2.39); the fcntl filter rule is
   gone, getdents64 stays admitted only with a wire-34 scope. Measured on
   a Linux x86_64 host with gcc -Werror: listing byte-exact, refusals
-  SIGILL, probes SIGSYS, read/range/fuel unchanged."
-  "147b0344fabaedc9cc9740f7ab87a785344f6b074a39ebca69ac8f256433a3a0")
+  SIGILL, probes SIGSYS, read/range/fuel unchanged.
+
+  Advanced 2026-09-08: the two VECTOR ARENAS become per-run budgets, and
+  exhausting one says so. Three changes, and the last is the reason the first
+  two are worth reviewing.
+
+  KEXE_VECTOR_CAPACITY and KEXE_VECTOR_ITEM_CAPACITY default to the 4096
+  handles and 65536 words they were as fixed arrays, so a guest that ran
+  before runs identically and one that did not still refuses unless its
+  caller asks. Parsed like KEXE_FUEL -- a positive decimal integer or a
+  refusal before the guest starts, never a coercion -- and capped so the two
+  arenas together cannot exceed 1 GiB, checked for wraparound before the
+  product is compared. The arrays move out of `struct kexe_shared_v4` into a
+  flexible tail of the SAME shared mapping, addressed by byte offsets rather
+  than pointers, so the parent still reads what the child wrote. Every
+  context-abi offset is unchanged and its `_Static_assert` still holds; the
+  two asserts that pinned the ARRAY sizes are gone, because there are no
+  longer arrays to size.
+
+  Exhaustion now names itself. Every arena site did `raise(SIGILL)` and
+  nothing else, and the structured report described the PAIR heap, which
+  vector work never touches -- so a guest that outgrew an arena looked to its
+  author like a miscompilation. Measured 2026-09-08 running X25519
+  (kotoba-lang/org-ietf-x25519) natively: `{:kind :signal :signal :SIGILL}`
+  beside `:heap {:capacity 4096 :used 0}`, with nothing pointing at a vector.
+  The ten sites now write `KEXE_TRAP {:kind :arena :reason
+  :vector-table-exhausted}` or `:vector-items-exhausted` first, through the
+  same `write(2)` shape `probe_denied` uses, and the report carries
+  `:vectors` and `:vector-items` on every run.
+
+  Why it was needed, measured rather than argued: X25519 takes 1,165,132
+  handles and 31,933,313 items to answer -- 285x and 487x the defaults, 274
+  MiB across the two arenas. Under them the ladder answers RFC 7748 section
+  5.2's first test vector as a native binary, `{:status :ok :result 0}`; at
+  the defaults the same binary traps and now says which arena filled.
+  Compiled with `-Wall -Wextra -Werror` on aarch64-apple-darwin and executed
+  against the real kexe process."
+  "0ac859c7eb121682ba0e4a0b5e6074ff283cde8c84d0c44f6d676b4c63e0f1eb")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
