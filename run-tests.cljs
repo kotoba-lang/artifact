@@ -10,8 +10,18 @@
 ;;   descriptor_table_test  asserts through `java.util.List` interop, which
 ;;     has no meaning on this host. Genuinely JVM-only. Nothing to fix.
 ;;
-;;   content_identity_test  requires `ipld.core`, and `ipld.link` CANNOT LOAD
-;;     UNDER NBB AT ALL. Measured 2026-09-08 by requiring it directly:
+;;   content_identity_test  runs here as of 2026-09-08. It did not, and the
+;;     reason recorded in this file a few hours earlier was WRONG in a way
+;;     worth keeping: `ipld.link` failed to load under nbb with `Protocol not
+;;     found: IEquiv`, and I recorded that as a defect in io-ipld. It was not.
+;;     io-ipld fixed it in 309db3f on 2026-08-11 by switching `Link` from
+;;     `deftype` to `defrecord`; THIS REPOSITORY's pin was 5d8de535, which is
+;;     exactly ONE COMMIT SHORT of that fix. I measured a real failure against
+;;     a stale dependency and attributed it to the dependency's code.
+;;
+;;     The pin is a6601e49 now and the namespace loads. A `.gitlibs` checkout
+;;     resolved from a pin is not the upstream repository, and a finding about
+;;     one is not a finding about the other.
 ;;
 ;;       Protocol not found: IEquiv
 ;;       io-ipld/src/ipld/link.cljc:31
@@ -37,6 +47,7 @@
 (ns run-tests
   (:require [cljs.test :as t]
             [artifact-test]
+            [content-identity-test]
             [cross-host-digest-test]))
 
 (defmethod t/report [:cljs.test/default :end-run-tests] [m]
@@ -46,4 +57,5 @@
     (set! (.-exitCode js/process) 1)))
 
 (t/run-tests 'artifact-test
+             'content-identity-test
              'cross-host-digest-test)
