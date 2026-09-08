@@ -10,25 +10,27 @@
 ;;   descriptor_table_test  asserts through `java.util.List` interop, which
 ;;     has no meaning on this host. Genuinely JVM-only. Nothing to fix.
 ;;
-;;   content_identity_test  is portable in principle -- `content_identity.cljc`
-;;     is `.cljc` -- but it requires `ipld.core`, which needs the npm package
-;;     `@noble/hashes` at runtime, and THIS REPOSITORY DECLARES NO NPM
-;;     DEPENDENCIES AT ALL. It has no package.json. It resolves today only when
-;;     nbb is started from a directory that happens to have `@noble/hashes` in
-;;     an ancestor `node_modules` -- the superproject root does; a fresh clone
-;;     of this repository does not.
+;;   content_identity_test  requires `ipld.core`, and `ipld.link` CANNOT LOAD
+;;     UNDER NBB AT ALL. Measured 2026-09-08 by requiring it directly:
 ;;
-;;     `kotoba-lang/io-ipld` does not declare it either (its package.json lists
-;;     only nbb and shadow-cljs as devDependencies), so this is a gap in the
-;;     family and not something to paper over here by pinning a version guessed
-;;     from whatever the ambient tree happens to hold. Measured 2026-09-08: the
-;;     ambient copy is 2.4.0, and nothing in either repository asks for it.
+;;       Protocol not found: IEquiv
+;;       io-ipld/src/ipld/link.cljc:31
 ;;
-;;     When `@noble/hashes` is declared somewhere that a clone of this repo can
-;;     see, move this file back to `.cljc` and add it to both lists below. Its
-;;     content-identity CIDs are the same class of two-implementation risk that
-;;     `cross_host_digest_test` covers for `sha256`, and they are still
-;;     UNMEASURED on this host.
+;;     Its `Link` deftype extends `IEquiv` and `IHash` in its `:cljs` branch,
+;;     and nbb's SCI-based deftype does not resolve those protocol symbols.
+;;     io-ipld's own docstring at that line says the repository runs its
+;;     ClojureScript tests under shadow-cljs -- so the branch is exercised
+;;     there and has never run here.
+;;
+;;     That is a finding about io-ipld, not about this repository, and it is
+;;     load-bearing: `Link` is the IPLD content-addressing primitive, and the
+;;     JVM-free runtime cannot construct one. Content-identity CIDs therefore
+;;     remain UNMEASURED on this host -- the same gap
+;;     `cross_host_digest_test` closed for `sha256`, still open one layer up.
+;;
+;;     `@noble/hashes` is declared in package.json regardless: it is a real
+;;     dependency of `content_identity.cljc` through `ipld.core`, whether or
+;;     not the test can run today.
 ;;
 ;; Anything added to `test/` as `.cljc` belongs in BOTH lists below. Being
 ;; required is not being run.
