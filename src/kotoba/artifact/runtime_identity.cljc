@@ -358,35 +358,15 @@
   aarch64-apple-darwin and on x86_64 under Rosetta, and no Windows fleet node
   has run this one.
 
-  Advanced 2026-09-08 alongside the POSIX loader, and NOT symmetrically with
-  it. What both now do: name the arena that ran out
-  (`KEXE_TRAP {:kind :arena :reason :vector-table-exhausted}` or
-  `:vector-items-exhausted`) instead of trapping silently, and carry
-  `:vectors` and `:vector-items` in every structured report. That half is the
-  cross-platform contract -- `kototama.native.executor` matches the report's
-  key set exactly, so a loader missing the two fields fails every native
-  execution as malformed evidence, which is how the asymmetry was found
-  rather than assumed (CI's windows-2025 and windows-arm64 jobs, 2026-09-08).
-
-  What only the POSIX loader does: take the two capacities as a per-run
-  budget. Here they are still compile-time constants, so a Windows guest that
-  needs a bigger arena has no way to ask. Raising them needs the arrays moved
-  out of `struct kexe_context` into a separately sized allocation, and this
-  file cannot be compiled or executed on the machine that would make that
-  change -- so it is stated as a gap rather than attempted blind. The report
-  reads the constants, so a Windows report is well-formed and honest about
-  what it can offer.
-
-  Advanced again the same day, for one attribute. `-Werror` on amu's
-  windows-2025 and windows-arm64 jobs refused the version above: each
-  `arena_exhausted` call replaced a bare `__builtin_trap()` inside a
-  value-returning function, and the compiler knows the builtin does not
-  return while it does not know that about a call. `noreturn` restores what
-  the bare trap told it; no path that runs behaves differently. Worth a line
-  here because it is the kind of defect the machine that writes this file
-  cannot find -- there is no windows.h on it -- so the Windows jobs are not
-  a formality on this pin, they are the verification."
-  "0269b0ab04c404fb02e6a72b955071d187bf9c210f1676aa77f5472802757222")
+  Held at f10a99e4 for the NAME<TAB>D wire-34 widening (jvm-retire item 1,
+  2026-09-09): the browse widening is posix-only and amu's windows loader is
+  unchanged (the posix docstring above says the same). The arena windows
+  identity that reports :vectors / :vector-items advances again only when
+  the change carrying that loader lands as its own unit - pairing it with a
+  posix loader that does not report the arenas would be unverifiable under
+  any single executor (the old executor rejects the :vectors keys, the new
+  one requires them from both hosts)."
+  "f10a99e4cd348de75f025ee79dc4a2de580160197c1162ccd7e693ac64ddfde7")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
