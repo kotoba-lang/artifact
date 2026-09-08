@@ -1,7 +1,24 @@
 (ns content-identity-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require #?(:clj  [clojure.test :refer [deftest is testing]]
+               :cljs [cljs.test :refer [deftest is testing] :include-macros true])
             [ipld.core :as ipld]
             [kotoba.artifact.content-identity :as identity]))
+
+(defn- bytes-of
+  "A byte container of XS on either host. `content_identity.cljc`'s own
+  `bytes?` predicate accepts `js/Uint8Array` on cljs, so this matches the shape
+  the SOURCE already declares rather than inventing a second one."
+  [xs]
+  #?(:clj (byte-array xs) :cljs (js/Uint8Array. (clj->js xs))))
+
+(defn- utf8
+  "UTF-8 bytes of S. `(.getBytes s \"UTF-8\")` is JVM-only and was one of the
+  two things keeping this file `.clj`. The other was `ipld.link`, which could
+  not load under nbb until this repository's io-ipld pin moved past 309db3f."
+  [s]
+  #?(:clj (.getBytes ^String s "UTF-8")
+     :cljs (.encode (js/TextEncoder.) s)))
+
 
 (def def-cid "bafyreihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku")
 (def toolchain-cid "bafyreic3f5k3w6yqxg6v3s4h2m5r7dngpmv3zmdp4px7gq6n5l6s2by5de")
@@ -13,8 +30,8 @@
    :dependencies {:toolchain toolchain-cid}})
 
 (deftest source-cid-addresses-exact-bytes
-  (let [a (.getBytes "(def x 1)" "UTF-8")
-        b (.getBytes "(def  x 1)" "UTF-8")]
+  (let [a (utf8 "(def x 1)")
+        b (utf8 "(def  x 1)")]
     (is (re-matches #"bafkrei[a-z2-7]{52}" (identity/source-cid a)))
     (is (= "bafkreihvye2l63bnbojfkjbef37e3vkwjw7mm74dfn7eqtykjpizmpejhe"
            (identity/source-cid a)))
@@ -37,7 +54,7 @@
 
 (deftest artifact-cid-binds-bytes-descriptor-definition-and-build
   (let [build-cid (identity/build-cid build)
-        input {:bytes (byte-array [0x7f 0x45 0x4c 0x46])
+        input {:bytes (bytes-of [0x7f 0x45 0x4c 0x46])
                :descriptor {:format :elf64 :entry 'main}
                :definition-cid def-cid
                :build-cid build-cid}
@@ -46,18 +63,18 @@
     (is (re-matches #"bafkrei[a-z2-7]{52}" (:payload-cid block)))
     (is (not= (:cid block)
               (identity/artifact-cid
-               (assoc input :bytes (byte-array [0x7f 0x45 0x4c 0x47])))))
+               (assoc input :bytes (bytes-of [0x7f 0x45 0x4c 0x47])))))
     (is (not= (:cid block)
               (identity/artifact-cid
                (assoc-in input [:descriptor :format] :macho))))))
 
 (deftest identity-envelopes-fail-closed
   (testing "unknown build fields"
-    (is (thrown? clojure.lang.ExceptionInfo
+    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
                  (identity/build-cid (assoc build :ambient "ignored")))))
   (testing "source and artifact payloads are bytes"
-    (is (thrown? clojure.lang.ExceptionInfo (identity/source-cid "source")))
-    (is (thrown? clojure.lang.ExceptionInfo
+    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) (identity/source-cid "source")))
+    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
                  (identity/artifact-cid
                   {:bytes "ELF" :descriptor {} :definition-cid def-cid
                    :build-cid (identity/build-cid build)})))))
