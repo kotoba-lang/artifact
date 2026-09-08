@@ -7,7 +7,7 @@
   mistake -- which is the exact failure the single-encoding rule exists to
   prevent. Expected text bytes come from `ascii` below, which is
   `clojure.core/int` over the characters and shares nothing with the encoder."
-  (:require [clojure.string :as string]
+  (:require [kotoba.lang.text :as string]
             [clojure.test :refer [deftest is testing]]
             [kotoba.artifact.core :as artifact]
             [kotoba.artifact.descriptor-table :as table]
