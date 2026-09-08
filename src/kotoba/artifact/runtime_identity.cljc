@@ -338,8 +338,27 @@
   leaving them to be discovered later. What is still NOT claimed is
   execution: the POSIX twin was run against a real kexe process on
   aarch64-apple-darwin and on x86_64 under Rosetta, and no Windows fleet node
-  has run this one."
-  "f10a99e4cd348de75f025ee79dc4a2de580160197c1162ccd7e693ac64ddfde7")
+  has run this one.
+
+  Advanced 2026-09-08 alongside the POSIX loader, and NOT symmetrically with
+  it. What both now do: name the arena that ran out
+  (`KEXE_TRAP {:kind :arena :reason :vector-table-exhausted}` or
+  `:vector-items-exhausted`) instead of trapping silently, and carry
+  `:vectors` and `:vector-items` in every structured report. That half is the
+  cross-platform contract -- `kototama.native.executor` matches the report's
+  key set exactly, so a loader missing the two fields fails every native
+  execution as malformed evidence, which is how the asymmetry was found
+  rather than assumed (CI's windows-2025 and windows-arm64 jobs, 2026-09-08).
+
+  What only the POSIX loader does: take the two capacities as a per-run
+  budget. Here they are still compile-time constants, so a Windows guest that
+  needs a bigger arena has no way to ask. Raising them needs the arrays moved
+  out of `struct kexe_context` into a separately sized allocation, and this
+  file cannot be compiled or executed on the machine that would make that
+  change -- so it is stated as a gap rather than attempted blind. The report
+  reads the constants, so a Windows report is well-formed and honest about
+  what it can offer."
+  "9fe394a9c9402a21ee619b99fd987e686a307798752e75b98e5e9cd8ca778098")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
