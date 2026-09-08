@@ -252,8 +252,25 @@
   5.2's first test vector as a native binary, `{:status :ok :result 0}`; at
   the defaults the same binary traps and now says which arena filled.
   Compiled with `-Wall -Wextra -Werror` on aarch64-apple-darwin and executed
-  against the real kexe process."
-  "0ac859c7eb121682ba0e4a0b5e6074ff283cde8c84d0c44f6d676b4c63e0f1eb")
+  against the real kexe process.
+
+  Advanced 2026-09-08 (jvm-retire item 1): wire 34 :fs/browse answers
+  NAME<TAB>D -- D is "1" for a directory and "0" for a file -- instead of
+  names-only lines, the same wire the js host (kotoba bin/kbb_js.cljs) and
+  kotoba lib/kbb/browse.kotoba answer: the is-directory flag is what a
+  recursive scan needs, so a guest can walk a tree without guessing which
+  entry is a directory. The flag is taken from the SAME dirent record that
+  supplied the name (d_type == DT_DIR; byte 18 of the raw getdents64 record
+  on Linux, entry->d_type on macOS), never from a separate stat, so a
+  symlink answers "0" exactly as readdirSync withFileTypes does. The
+  listing byte accounting now counts name + TAB + D flag + separator, which
+  also fixes the old accumulation that was one byte short per multi-entry
+  listing while the provider wrote the full string. Measured through kotoba
+  kbb_shim_test and amu's conformance probe: the three-file fixture
+  ".h\t0\na\t0\nb\t0" answers 12 bytes on both JVM-free hosts, and the
+  four-file conformance fixture answers ".hidden\t0\na.txt\t0\nb.txt\t0\nz\t0".
+  kexe_loader_windows.c is unchanged (it has no wire-34 provider)."
+  "9942820b279a2526bf9f56886b08368488a1ef1b082c7d91154e5102d66dd36b")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
