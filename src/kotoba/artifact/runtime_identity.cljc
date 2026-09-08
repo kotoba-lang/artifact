@@ -255,14 +255,14 @@
   against the real kexe process.
 
   Advanced 2026-09-08 (jvm-retire item 1): wire 34 :fs/browse answers
-  NAME<TAB>D -- D is "1" for a directory and "0" for a file -- instead of
+  NAME<TAB>D -- D is 1 for a directory and 0 for a file -- instead of
   names-only lines, the same wire the js host (kotoba bin/kbb_js.cljs) and
   kotoba lib/kbb/browse.kotoba answer: the is-directory flag is what a
   recursive scan needs, so a guest can walk a tree without guessing which
   entry is a directory. The flag is taken from the SAME dirent record that
   supplied the name (d_type == DT_DIR; byte 18 of the raw getdents64 record
   on Linux, entry->d_type on macOS), never from a separate stat, so a
-  symlink answers "0" exactly as readdirSync withFileTypes does. The
+  symlink answers 0 exactly as readdirSync withFileTypes does. The
   listing byte accounting now counts name + TAB + D flag + separator, which
   also fixes the old accumulation that was one byte short per multi-entry
   listing while the provider wrote the full string. Measured through kotoba
