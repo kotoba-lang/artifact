@@ -1,5 +1,6 @@
 (ns artifact-test
-  (:require [clojure.test :refer [deftest is]]
+  (:require #?(:clj  [clojure.test :refer [deftest is]]
+               :cljs [cljs.test :refer [deftest is] :include-macros true])
             [kotoba.artifact.core :as artifact]
             [kotoba.artifact.runtime-identity]))
 
