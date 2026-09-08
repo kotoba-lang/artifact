@@ -267,8 +267,10 @@
   also fixes the old accumulation that was one byte short per multi-entry
   listing while the provider wrote the full string. Measured through kotoba
   kbb_shim_test and amu's conformance probe: the three-file fixture
-  ".h\t0\na\t0\nb\t0" answers 12 bytes on both JVM-free hosts, and the
-  four-file conformance fixture answers ".hidden\t0\na.txt\t0\nb.txt\t0\nz\t0".
+  ".h" + TAB + "0" + NL + "a" + TAB + "0" + NL + "b" + TAB + "0" answers
+  12 bytes on both JVM-free hosts, and the four-file conformance fixture
+  answers ".hidden" + TAB + "0" + NL + "a.txt" + TAB + "0" + NL + "b.txt" +
+  TAB + "0" + NL + "z" + TAB + "0".
   kexe_loader_windows.c is unchanged (it has no wire-34 provider)."
   "9942820b279a2526bf9f56886b08368488a1ef1b082c7d91154e5102d66dd36b")
 
