@@ -357,8 +357,18 @@
   file cannot be compiled or executed on the machine that would make that
   change -- so it is stated as a gap rather than attempted blind. The report
   reads the constants, so a Windows report is well-formed and honest about
-  what it can offer."
-  "9fe394a9c9402a21ee619b99fd987e686a307798752e75b98e5e9cd8ca778098")
+  what it can offer.
+
+  Advanced again the same day, for one attribute. `-Werror` on amu's
+  windows-2025 and windows-arm64 jobs refused the version above: each
+  `arena_exhausted` call replaced a bare `__builtin_trap()` inside a
+  value-returning function, and the compiler knows the builtin does not
+  return while it does not know that about a call. `noreturn` restores what
+  the bare trap told it; no path that runs behaves differently. Worth a line
+  here because it is the kind of defect the machine that writes this file
+  cannot find -- there is no windows.h on it -- so the Windows jobs are not
+  a formality on this pin, they are the verification."
+  "0269b0ab04c404fb02e6a72b955071d187bf9c210f1676aa77f5472802757222")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
