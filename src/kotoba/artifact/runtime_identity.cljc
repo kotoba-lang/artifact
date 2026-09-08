@@ -216,8 +216,24 @@
   trapped (measured with strace on glibc 2.39); the fcntl filter rule is
   gone, getdents64 stays admitted only with a wire-34 scope. Measured on
   a Linux x86_64 host with gcc -Werror: listing byte-exact, refusals
-  SIGILL, probes SIGSYS, read/range/fuel unchanged."
-  "147b0344fabaedc9cc9740f7ab87a785344f6b074a39ebca69ac8f256433a3a0")
+  SIGILL, probes SIGSYS, read/range/fuel unchanged.
+
+  Advanced 2026-09-08 (jvm-retire item 1): wire 34 :fs/browse answers
+  NAME<TAB>D -- D is "1" for a directory and "0" for a file -- instead of
+  names-only lines, the same wire the js host (kotoba bin/kbb_js.cljs) and
+  kotoba lib/kbb/browse.kotoba answer: the is-directory flag is what a
+  recursive scan needs, so a guest can walk a tree without guessing which
+  entry is a directory. The flag is taken from the SAME dirent record that
+  supplied the name (d_type == DT_DIR; byte 18 of the raw getdents64 record
+  on Linux, entry->d_type on macOS), never from a separate stat, so a
+  symlink answers "0" exactly as readdirSync withFileTypes does. The
+  listing byte accounting now counts name + TAB + D flag + separator, which
+  also fixes the old accumulation that was one byte short per multi-entry
+  listing while the provider wrote the full string. Measured through kotoba
+  kbb_shim_test and this repo's conformance probe: the three-file fixture
+  ".h\t0\na\t0\nb\t0" answers 12 bytes on both JVM-free hosts.
+  kexe_loader_windows.c is unchanged (it has no wire-34 provider)."
+  "9942820b279a2526bf9f56886b08368488a1ef1b082c7d91154e5102d66dd36b")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
