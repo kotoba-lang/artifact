@@ -330,8 +330,17 @@
   `:vectors {:capacity 4096 :used 0} :vector-items {:capacity 65536 :used 0}`
   -- exactly the key set the validator names.
 
-  Receipts naming either previous identity no longer verify."
-  "1db44d9aed71e2dea6e5c94bb6f8637fe76d08dc3a23c8970c15521233d0257c")
+  Advanced a third time the same day, and this one adds a `_Static_assert`
+  rather than a behaviour: the region pool must be the LAST field of the
+  shared mapping. It is the only guest-WRITABLE arena a caller hands an
+  address to, so a write past its end has to leave the mapping and trap
+  instead of reaching a handle table, where the same write would be a wrong
+  answer rather than a stopped one. The emitted bounds check should make that
+  unreachable; the assert is what keeps a later field from being appended
+  after it, and it is a check rather than a comment saying so.
+
+  Receipts naming any previous identity no longer verify."
+  "ef9b2dffdc87249d73e4d0fb7afcd31815ac484e83ffee0161559a72458a22eb")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
