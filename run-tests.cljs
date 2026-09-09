@@ -48,7 +48,8 @@
   (:require [cljs.test :as t]
             [artifact-test]
             [content-identity-test]
-            [cross-host-digest-test]))
+            [cross-host-digest-test]
+            [descriptor-table-test]))
 
 (defmethod t/report [:cljs.test/default :end-run-tests] [m]
   (println (str "\nnbb: " (:test m) " tests, " (:pass m) " passed, "
@@ -58,4 +59,5 @@
 
 (t/run-tests 'artifact-test
              'content-identity-test
-             'cross-host-digest-test)
+             'cross-host-digest-test
+             'descriptor-table-test)
