@@ -306,8 +306,32 @@
   0; a forward reference, an unminted length, odd hex and an over-pool region
   each exited 2 with no report. Receipts naming the previous identity no
   longer verify against this loader. kexe_loader_windows.c is unchanged and
-  has no region forms."
-  "ee1a3c2c0271cd070458c5b3ce446ece31ee2e0964086066f94998cd2ba27d67")
+  has no region forms.
+
+  Advanced again 2026-09-09, same day, and the second advance is the more
+  interesting one: THE REPORT TAIL. `kototama.native.executor`'s
+  `valid-supervisor-report?` has expected `:vectors` and `:vector-items` in
+  every `:ok` and `:trap` report since 2026-09-08 -- the two vector arenas are
+  separately exhaustible and were the only bounded resource a run could hit
+  without the report mentioning it, arriving as a bare SIGILL beside a `:heap`
+  line about the PAIR arena, which vector work never touches.
+
+  This loader never gained the other half. It printed `:status :result :fuel
+  :heap` and nothing else, in all ten of its report sites. The disagreement
+  was invisible because amu pinned an older kototama-native whose validator
+  did not ask for them; advancing that pin is what surfaced it, as
+  \"malformed native supervisor evidence (exit=0, report-status=:ok)\" -- a
+  run that did exactly what it was asked and was rejected for the shape of the
+  sentence it said so in.
+
+  The tail is now one macro rather than ten copies, which is why the two
+  arenas could be added in one place. Measured against the real kexe process:
+  a granted 64-byte region still answers 2080, and the report now carries
+  `:vectors {:capacity 4096 :used 0} :vector-items {:capacity 65536 :used 0}`
+  -- exactly the key set the validator names.
+
+  Receipts naming either previous identity no longer verify."
+  "1db44d9aed71e2dea6e5c94bb6f8637fe76d08dc3a23c8970c15521233d0257c")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
