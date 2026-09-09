@@ -345,8 +345,8 @@
   `:io/write-error` (wire 39) write fd 1 and fd 2; `:cli/args` (wire 38)
   answers the argument count for the empty request and the i-th argument for
   a decimal one, split from the loader's own argv at `--`. `:fs/app-data`
-  (35) gained an EXISTS form, which is what lets a command tell "no such
-  file" from "empty file" without trapping -- out of scope answers "0"
+  (35) gained an EXISTS form, which is what lets a command tell \"no such
+  file\" from \"empty file\" without trapping -- out of scope answers \"0\"
   rather than refusing, so probing cannot be used to map the filesystem
   outside the grant.
 
