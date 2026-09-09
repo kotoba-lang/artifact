@@ -355,6 +355,24 @@
   (allow[32] spans 16..48, every later field is a pointer), and its
   _Static_assert will catch the layout on a real Windows build.
 
+  Advanced 2026-09-09, and this ENDS A DELIBERATE HOLD. amu's deps.edn recorded
+  why the identity sat at f10a99e4: an arena windows loader reports :vectors
+  and cannot pair with a posix loader that does not, under any single executor,
+  so the windows side was held back to stay paired with a posix loader that had
+  never gained the two arenas.
+
+  The posix loader gained them the same day, which resolves the pairing in the
+  other direction: both report :vectors and :vector-items now, in all nine
+  windows report sites and all ten posix ones, from one macro each. The hold is
+  over because the thing it was waiting for happened.
+
+  The asymmetry this docstring already names still holds -- the posix loader
+  was compiled and executed for this change and this one was not, because it
+  needs windows.h. What WAS checked is the format/argument pairing at every one
+  of the nine sites, mechanically, and the check was shown to be non-vacuous:
+  dropping one argument from the macro turns all nine red. CI on windows-2025
+  and windows-arm64 is what executes it.
+
   Advanced 2026-08-04 again alongside the POSIX loader, with the same
   string_code_point_at at offset 144. The same verification asymmetry applies:
   compiled and executed for POSIX, read and reasoned about for Windows.
@@ -435,7 +453,7 @@
   posix loader that does not report the arenas would be unverifiable under
   any single executor (the old executor rejects the :vectors keys, the new
   one requires them from both hosts)."
-  "f10a99e4cd348de75f025ee79dc4a2de580160197c1162ccd7e693ac64ddfde7")
+  "15fe0733ea7873fc6353f04820a2673ec7b750825fe5c39db669f406905f5125")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
