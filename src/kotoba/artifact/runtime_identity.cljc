@@ -339,8 +339,38 @@
   unreachable; the assert is what keeps a later field from being appended
   after it, and it is a check rather than a comment saying so.
 
+  Advanced 2026-09-10: the loader gained what a COMMAND needs, which is the
+  three things a Unix utility does that a pure computation does not -- read
+  its argv, write stdout, and write stderr. `:io/write` (wire 37) and
+  `:io/write-error` (wire 39) write fd 1 and fd 2; `:cli/args` (wire 38)
+  answers the argument count for the empty request and the i-th argument for
+  a decimal one, split from the loader's own argv at `--`. `:fs/app-data`
+  (35) gained an EXISTS form, which is what lets a command tell "no such
+  file" from "empty file" without trapping -- out of scope answers "0"
+  rather than refusing, so probing cannot be used to map the filesystem
+  outside the grant.
+
+  The arenas became per-run budgets (KEXE_FUEL, KEXE_STRING_POOL,
+  KEXE_PAIRS), and that is what forced the report change. `:heap :capacity`
+  had been printing the compile-time constant, so a run with KEXE_PAIRS
+  raised reported `:capacity 4096 :used 8013` -- a use larger than its own
+  capacity. A bound you can see WRONG is worse than one you cannot see. The
+  string arena had no line at all, so a guest that exhausted it had nothing
+  to read; it now reports `:string-pool {:capacity N :used M}` from the same
+  shared tail macro every other site uses, which is why it appears in the
+  `:ok` and `:trap` shapes alike.
+
+  Defaults did not move. What moved is that they are now defaults rather
+  than constants, and that the report says which one is in force.
+
+  kototama-native's `valid-supervisor-report?` compares the report's key set
+  for EXACT equality, so it learns `:string-pool` in the same wave. It pins
+  the key's structure and bounds rather than its capacity, for the reason it
+  already gives for the vector arenas: pinning a constant would refuse every
+  run that raised the budget, which is the whole point of its being raisable.
+
   Receipts naming any previous identity no longer verify."
-  "ef9b2dffdc87249d73e4d0fb7afcd31815ac484e83ffee0161559a72458a22eb")
+  "65f001ee0e23f750fab5810f84c00ab0c33f62a7daf9527596c80f3e4f7822d4")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
