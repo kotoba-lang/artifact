@@ -1,6 +1,14 @@
 (ns descriptor-table-test
   "Content assertions on the descriptor table an artifact carries.
 
+  `.cljc` since 2026-09-10. `kotoba.artifact.descriptor-table` is `.cljc` and
+  this was its only test, so the source was verified on one host -- and on the
+  other host it cannot do its job at all: `contract-entry?` requires
+  `nat-int?` of every capability id, and `(nat-int? (js/BigInt 7))` is FALSE,
+  so `validate!` refuses a table carrying the ids a compiler actually holds on
+  ClojureScript. Nothing feeds it those ids today, because nothing outside
+  this repository requires this namespace at all (measured below).
+
   These are written against HAND-BUILT expected byte vectors, not against a
   decoder in this repo. A decoder here would be checked only against the encoder
   it was written beside, and the two would then be free to agree on the same
@@ -8,15 +16,34 @@
   prevent. Expected text bytes come from `ascii` below, which is
   `clojure.core/int` over the characters and shares nothing with the encoder."
   (:require [kotoba.lang.text :as string]
-            [clojure.test :refer [deftest is testing]]
+            #?(:clj  [clojure.test :refer [deftest is testing]]
+               :cljs [cljs.test :refer [deftest is testing] :include-macros true])
             [kotoba.artifact.core :as artifact]
             [kotoba.artifact.descriptor-table :as table]
             [kotoba.kir.descriptor :as descriptor]))
 
+
+(defn- index-of
+  "Position of X in COLL, or nil. `(.indexOf ^java.util.List v x)` was a Java
+  interop call on a vector; ClojureScript's `.indexOf` is an Array method and a
+  PersistentVector is not one, so the interop had to go rather than be
+  reader-conditionalised."
+  [coll x]
+  (first (keep-indexed #(when (= %2 x) %1) coll)))
+
 (defn- ascii
-  "Bytes of an ASCII string, computed without touching the encoder."
+  "Bytes of an ASCII string, computed without touching the encoder.
+
+  `(mapv int (seq text))` was correct on the JVM and silently wrong on
+  ClojureScript, which is how this helper survived being read: there `(seq
+  \"ab\")` yields one-character STRINGS rather than characters, and `(int
+  \"a\")` is 0, so every name came back as its length followed by that many
+  zeros. Measured when this file became `.cljc`: `(text \":message\")`
+  answered [8 0 0 0 0 0 0 0 0 1]. The expected bytes were the broken side --
+  the encoder under test was right."
   [text]
-  (mapv int (seq text)))
+  #?(:clj  (mapv int (seq text))
+     :cljs (mapv #(.charCodeAt % 0) (seq text))))
 
 (defn- text
   "A length-prefixed name as the format specifies it: one ULEB length byte for
@@ -90,8 +117,7 @@
     (is (= [9 2 58 114 2 2 58 97 0 2 58 98 1] encoded-ab))
     (is (= [9 2 58 114 2 2 58 98 1 2 58 97 0] encoded-ba))
     (is (not= encoded-ab encoded-ba))
-    (is (< (.indexOf ^java.util.List encoded-ab (int 97))
-           (.indexOf ^java.util.List encoded-ab (int 98)))
+    (is (< (index-of encoded-ab 97) (index-of encoded-ab 98))
         ":a must be carried before :b")
     ;; Same members, opposite order, therefore two distinct table entries.
     (is (= 2 (count (distinct [encoded-ab encoded-ba]))))))
@@ -204,21 +230,29 @@
   (let [good (section [:i64 :string] [{:capability 7 :request-index 0 :result-index 1}])]
     (is (= good (table/validate! good)))
     (testing "index outside the table"
-      (is (thrown? clojure.lang.ExceptionInfo
+      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
                    (table/validate!
                     (section [:i64] [{:capability 7 :request-index 0 :result-index 4}])))))
     (testing "one capability with two contracts"
-      (is (thrown? clojure.lang.ExceptionInfo
+      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
                    (table/validate!
                     (section [:i64 :string]
                              [{:capability 7 :request-index 0 :result-index 0}
                               {:capability 7 :request-index 1 :result-index 1}])))))
+    (testing "contracts out of capability order -- the same rule one level up,
+              and until 2026-09-10 nothing asserted it: deleting the check
+              left this whole suite green, which is how it was found"
+      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+                   (table/validate!
+                    (section [:i64 :string]
+                             [{:capability 9 :request-index 0 :result-index 1}
+                              {:capability 7 :request-index 0 :result-index 1}])))))
     (testing "descriptors out of canonical order -- two artifacts would otherwise
               carry the same types under different indices"
-      (is (thrown? clojure.lang.ExceptionInfo
+      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
                    (table/validate! (section [:string :i64] [])))))
     (testing "duplicate descriptors"
-      (is (thrown? clojure.lang.ExceptionInfo
+      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
                    (table/validate! (section [:i64 :i64] [])))))
     (testing "a descriptor edited without re-encoding: the drift detector"
       ;; Also the shape an encoder mismatch takes -- a verifier whose
@@ -234,16 +268,16 @@
       (let [drifted (assoc good :descriptors [:f64 :string])]
         (is (= (:descriptors drifted) (vec (sort-by pr-str (:descriptors drifted)))))
         (is (= (count (:descriptors good)) (count (:descriptors drifted))))
-        (is (thrown? clojure.lang.ExceptionInfo (table/validate! drifted)))))
+        (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) (table/validate! drifted)))))
     (testing "not a descriptor at all -- rejected before the re-encode, so an
               unencodable entry is refused rather than thrown out of the encoder"
-      (is (thrown? clojure.lang.ExceptionInfo
+      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
                    (table/validate! {:format table/format-tag
                                      :descriptors [:i64 :not-a-type]
                                      :contracts []
                                      :bytes-sha256 (artifact/sha256 [])}))))
     (testing "unknown key"
-      (is (thrown? clojure.lang.ExceptionInfo
+      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
                    (table/validate! (assoc good :extra 1)))))))
 
 (deftest capability-kit-qualification-is-untouched
