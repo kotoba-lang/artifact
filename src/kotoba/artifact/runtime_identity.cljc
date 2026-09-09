@@ -482,8 +482,20 @@
   the change carrying that loader lands as its own unit - pairing it with a
   posix loader that does not report the arenas would be unverifiable under
   any single executor (the old executor rejects the :vectors keys, the new
-  one requires them from both hosts)."
-  "15fe0733ea7873fc6353f04820a2673ec7b750825fe5c39db669f406905f5125")
+  one requires them from both hosts).
+
+  Advanced 2026-09-10 for \"string-pool\". The posix loader added that key to
+  every report when its arenas became per-run budgets, and
+  kototama-native's valid-supervisor-report? compares the report's key set
+  for EXACT equality -- so a loader that omits it is rejected as malformed
+  evidence, however correct the run was. With the posix side landed every
+  job went green except the two windows ones, which is how this was found.
+
+  The capacity printed here is the compile-time KEXE_STRING_POOL_BYTES, not
+  a budget: this loader has no KEXE_STRING_POOL override. The validator pins
+  the key's structure and bounds rather than its constant, so the two
+  loaders may disagree on the number and still pair under one executor."
+  "d3fa90ba2e79acbf019c5e26f48791bd3e537caf21b833eede840c2ce3a24af8")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
