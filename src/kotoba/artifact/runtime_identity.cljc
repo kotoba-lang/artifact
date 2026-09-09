@@ -270,8 +270,44 @@
   dot-h + TAB + 0 + NL + a + TAB + 0 + NL + b + TAB + 0 answers
   12 bytes on both JVM-free hosts, and the four-file conformance fixture
   answers the same shape for dot-hidden, a.txt, b.txt and z.
-  kexe_loader_windows.c is unchanged (it has no wire-34 provider)."
-  "9942820b279a2526bf9f56886b08368488a1ef1b082c7d91154e5102d66dd36b")
+  kexe_loader_windows.c is unchanged (it has no wire-34 provider).
+
+  Advanced 2026-09-09: GRANTED REGIONS. Two argument forms, `g:<hex>` and
+  `gl:<n>`, and a bounded pool at the tail of the shared mapping. `g:` mints a
+  region from host bytes and answers its BASE ADDRESS; `gl:` answers the
+  LENGTH the loader recorded for the n-th region minted so far.
+
+  Both numbers are the loader's, and that is the whole point of the pair
+  rather than of a single form: a caller can grant a region, and cannot grant
+  a base together with a length that does not belong to it. The guest's own
+  bounds check then compares an index against a length it did not choose
+  either. A forward reference (`gl:1` before a second `g:`) is refused rather
+  than answered with zero, and so are odd hex, a region past the 64 KiB pool,
+  and a ninth region.
+
+  WHY THIS EXISTS. `kotoba.verifier` 33b3d067 admits the slice memory
+  subfamily on general native targets when every base is provably a parameter
+  -- a region the CALLER granted. Until this loader there was no caller that
+  could grant one: `s:` arrives as a pair handle and a vector as an arena
+  handle, and neither is an address. So the language could read host memory
+  and nothing could hand it any.
+
+  The pool is 64 KiB, the same bound as the string pool and for the same
+  reason: both arrive as hex in argv, and argv is what limits them long before
+  the arena does. A region that does not fit through argv needs a different
+  transport, and that is a gap rather than a bound.
+
+  The fields are appended at the TAIL of `kexe_shared_v4`. Every offset the
+  loader asserts (`fuel` at 8, `allow` at 16, `cap_call` at 48) is inside
+  `context`, which is first, so nothing this file has ever pinned moves.
+
+  Measured against the real kexe process on 2026-09-09, aarch64-macos: a
+  64-byte granted region summed to 2080, a 10-byte one to 55, an empty one to
+  0; a forward reference, an unminted length, odd hex and an over-pool region
+  each exited 2 with no report. Receipts naming the previous identity no
+  longer verify against this loader. kexe_loader_windows.c is unchanged and
+  has no region forms."
+  "ee1a3c2c0271cd070458c5b3ce446ece31ee2e0964086066f94998cd2ba27d67")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
