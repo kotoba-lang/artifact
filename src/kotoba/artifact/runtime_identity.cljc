@@ -369,8 +369,40 @@
   already gives for the vector arenas: pinning a constant would refuse every
   run that raised the budget, which is the whole point of its being raisable.
 
+  Advanced 2026-09-10 again, for the six request forms a command needs to
+  CHANGE a filesystem rather than only read one. All six are new forms on
+  wire 35, not new capabilities, so nothing in the catalog or kotoba-sema
+  moved with them:
+
+      \"<path>MKDIR_SEP\"           create a directory
+      \"<path>UNLINK_SEP\"          remove a name, never a directory
+      \"<path>RMDIR_SEP\"           remove an EMPTY directory
+      \"<from>RENAME_SEP<to>\"      rename, both sides admitted
+      \"<path>STAT_SEP\"            mode, size, blocks, is-directory
+      \"<path>CHMOD_SEP<octal>\"    set the permission bits
+
+  The confinement is the part that was designed rather than assumed. Reading
+  and writing are safe because they OPEN the target and then ask
+  kexe_scope_contains_fd, which resolves the descriptor and so cannot be
+  fooled by a \"..\" component; kexe_scope_admit alone would be, since it
+  matches TEXT and \"<granted>/../etc\" prefixes \"<granted>\" at a slash. A
+  mutation has no descriptor for the thing it acts on, so the same guarantee
+  is taken one level up: open the PARENT, put it through the identical check,
+  then act with mkdirat/unlinkat/renameat on a single component that cannot
+  walk anywhere.
+
+  Two limits are deliberate. UNLINK_SEP never passes AT_REMOVEDIR, so a guest
+  that asked to remove a file cannot remove a directory instead. CHMOD_SEP
+  masks to the twelve permission bits, because a grant to write a file's
+  bytes is not a grant to make it run as someone else.
+
+  An operational failure ANSWERS \"0\" and only a grant violation traps. That
+  distinction was learned by writing mkdir: creating a directory whose parent
+  is absent trapped, and \"mkdir x/y\" with x missing is a diagnostic, not a
+  fault.
+
   Receipts naming any previous identity no longer verify."
-  "65f001ee0e23f750fab5810f84c00ab0c33f62a7daf9527596c80f3e4f7822d4")
+  "e648fbba7048a96b47ce9119c417e2f073ab26b49e81ab3ae9ac7c6d636d8a19")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
