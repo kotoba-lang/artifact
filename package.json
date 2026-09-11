@@ -6,6 +6,6 @@
     "@noble/hashes": "^2.4.0"
   },
   "scripts": {
-    "test:nbb": "nbb --classpath \"src:test:$(clojure -Spath -M:test)\" run-tests.cljs"
+    "test:nbb": "nbb --classpath \"src:test:$(clojure -Spath -M:test)\" run-tests.cljk"
   }
 }
