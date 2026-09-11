@@ -1,4 +1,4 @@
-;; nbb --classpath "src:test:$(clojure -Spath -M:test)" run-tests.cljk
+;; kbb --backend sci --classpath "src:test:$(kbb -Spath -M:test)" run-tests.cljk
 ;;
 ;; This repository had no ClojureScript runner until 2026-09-08, and its four
 ;; `.cljc` sources include TWO implementations of `sha256` -- `MessageDigest`
