@@ -87,5 +87,5 @@ capability kit is qualified by this: all remain `:native-aot :pending`.**
 ## Test
 
 ```bash
-clojure -M:test
+kbb -M:test
 ```
