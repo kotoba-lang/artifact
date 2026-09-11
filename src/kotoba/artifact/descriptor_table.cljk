@@ -48,6 +48,7 @@
   C), are separate landings. Nothing here qualifies any capability kit: every
   kit remains `:native-aot :pending` until a value of its shape actually crosses
   a real boundary."
+  {:kotoba/export [artifact-key attach carried contract descriptor-at format-tag section-bytes table validate! wire-version]}
   (:require [kotoba.artifact.core :as artifact]
             [kotoba.kir.descriptor :as descriptor]))
 

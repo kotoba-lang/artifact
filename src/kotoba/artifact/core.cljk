@@ -1,4 +1,5 @@
 (ns kotoba.artifact.core
+  {:kotoba/export [canonical-bytes edn-safe seal sha256 valid-seal?]}
   #?(:clj (:import [java.nio.charset StandardCharsets]
                    [java.security MessageDigest])
      :cljs (:require ["node:crypto" :as crypto]
