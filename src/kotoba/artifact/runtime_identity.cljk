@@ -425,8 +425,18 @@
   measured 75 ns/byte and exhausted a 4 Mi-handle arena after 2 MB.
   Executed under the loader for both changes: amu's
   jdk-free-native-conformance (string-index-of.kotoba answers 189600) and
-  test-package-command (8 checks, both directions for the CPU budget)."
-  "35b046ef5d47ab9cbe295392835166b8d3aeb4b2db06c77e6563e77db27c2d56")
+  test-package-command (8 checks, both directions for the CPU budget).
+
+  Advanced 2026-09-15 a third time: string-concat TAIL APPEND. When the first
+  operand is the pool's last allocation, only the second is copied and
+  charged, and the result is a longer view of the same bytes -- nothing any
+  existing handle covers changes (the argument is checked_vector_conj's).
+  This is what lets a guest keep a string builder: measured, uniq over
+  13,000 lines and sort over 4,600 exhausted gigabytes of pool by copying
+  their accumulator per step, and examples/tail-append.kotoba (20,000
+  appends under a 1 MiB pool) answers 200000 here where the loader before it
+  answers KEXE_TRAP SIGILL."
+  "18515c9ac95a0551d2eb75c267f6636c6dfb76bc10f38b6011ff2610a0152568")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -557,8 +567,11 @@
   memmem) and the same version refusal. The usual asymmetry: the POSIX
   loader was compiled and executed for this change; this one was
   cross-compiled reproducibly for x86-64 and Arm64 PE32+ by
-  amu's windows-loader-cross-compile and read, not run."
-  "012fffaf965e509fff2b29fd4d0e47fbbdcb15a880fdf71c5cc8f708d587b969")
+  amu's windows-loader-cross-compile and read, not run.
+
+  Advanced 2026-09-15 again alongside the POSIX loader: the same
+  string-concat tail append, cross-compiled, not run."
+  "ee9b3667aeba495c85b8be9917c166474edab5428fe7edc4be2161167a6cedfd")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
