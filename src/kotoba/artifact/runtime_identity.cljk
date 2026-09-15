@@ -402,8 +402,31 @@
   is absent trapped, and \"mkdir x/y\" with x missing is a diagnostic, not a
   fault.
 
-  Receipts naming any previous identity no longer verify."
-  "e648fbba7048a96b47ce9119c417e2f073ab26b49e81ab3ae9ac7c6d636d8a19")
+  Receipts naming any previous identity no longer verify.
+
+  Advanced 2026-09-15, twice in one landing (amu jv/abi-v5-string-index-of):
+
+  Wire 37 (:io/write) is buffered in the loader -- 64 KiB, flushed when
+  full, before any wire-39 diagnostic, at completion and in the trap
+  handler, since the wire has already answered a byte count for those
+  bytes. RLIMIT_CPU (1 s, hard 2) and the two wall alarms (2 inside 3) are
+  budgets with unchanged defaults: KEXE_CPU_SECONDS / KEXE_WALL_SECONDS, and
+  a packaged command bakes them. KEXE_PAIR_MAX is 64 Mi handles and
+  KEXE_STRING_POOL_MAX 1 GiB (address space; default budgets unchanged), and
+  :fs/browse refuses a listing only when it does not fit the string pool
+  budget. Measured on a packaged find: 34,803 entries died of SIGXCPU with
+  0.09 s of user time; sys 0.84 s -> 0.49 s with the buffer; 857,322 entries
+  needed 3.9 Mi handles against a 4 Mi ceiling.
+
+  Context ABI v5: string_index_of at offset 216 (checked_string_index_of,
+  memmem, an empty needle traps as in the reference interpreter),
+  kexe_context_v5, every checked_* refusing any other version. Before it the
+  search was a per-byte source rewrite in kotoba-native; a packaged grep
+  measured 75 ns/byte and exhausted a 4 Mi-handle arena after 2 MB.
+  Executed under the loader for both changes: amu's
+  jdk-free-native-conformance (string-index-of.kotoba answers 189600) and
+  test-package-command (8 checks, both directions for the CPU budget)."
+  "35b046ef5d47ab9cbe295392835166b8d3aeb4b2db06c77e6563e77db27c2d56")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -527,8 +550,15 @@
   The capacity printed here is the compile-time KEXE_STRING_POOL_BYTES, not
   a budget: this loader has no KEXE_STRING_POOL override. The validator pins
   the key's structure and bounds rather than its constant, so the two
-  loaders may disagree on the number and still pair under one executor."
-  "d3fa90ba2e79acbf019c5e26f48791bd3e537caf21b833eede840c2ce3a24af8")
+  loaders may disagree on the number and still pair under one executor.
+
+  Advanced 2026-09-15 alongside the POSIX loader: context ABI v5, the same
+  string_index_of at offset 216 (memchr + memcmp, since Windows has no
+  memmem) and the same version refusal. The usual asymmetry: the POSIX
+  loader was compiled and executed for this change; this one was
+  cross-compiled reproducibly for x86-64 and Arm64 PE32+ by
+  amu's windows-loader-cross-compile and read, not run."
+  "012fffaf965e509fff2b29fd4d0e47fbbdcb15a880fdf71c5cc8f708d587b969")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
