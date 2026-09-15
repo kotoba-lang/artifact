@@ -435,8 +435,18 @@
   13,000 lines and sort over 4,600 exhausted gigabytes of pool by copying
   their accumulator per step, and examples/tail-append.kotoba (20,000
   appends under a 1 MiB pool) answers 200000 here where the loader before it
-  answers KEXE_TRAP SIGILL."
-  "18515c9ac95a0551d2eb75c267f6636c6dfb76bc10f38b6011ff2610a0152568")
+  answers KEXE_TRAP SIGILL.
+
+  Advanced 2026-09-16: context ABI v6 -- arena_enter / arena_leave at 224 /
+  232, the region reset behind `(arena-scope body)` (superproject
+  ADR-2609160044). Enter pushes the four arena marks (pairs, pool, vectors,
+  vector items) on a 256-deep stack, leave pops and resets them; a leave at
+  depth 0 and an enter past the bound trap; the kgraph is not reset. The
+  safety argument is the type rule the frontend and the verifier hold the
+  body to (:i64 / :bool / :f64). Executed both ways by amu's
+  jdk-free-native-conformance under the loader's DEFAULT budgets: the same
+  20,000-iteration loop answers 200000 scoped and traps unscoped."
+  "cb5fffd09a210178320ee0756dc646f41622fcfeb27b94507bee4ab799c5695f")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -570,8 +580,11 @@
   amu's windows-loader-cross-compile and read, not run.
 
   Advanced 2026-09-15 again alongside the POSIX loader: the same
-  string-concat tail append, cross-compiled, not run."
-  "ee9b3667aeba495c85b8be9917c166474edab5428fe7edc4be2161167a6cedfd")
+  string-concat tail append, cross-compiled, not run.
+
+  Advanced 2026-09-16 alongside the POSIX loader: context ABI v6, the same
+  arena_enter / arena_leave slots and mark stack, cross-compiled, not run."
+  "d0797792d653aa7ce686aaaf94c5e07762a9ffe031f623e4e0c1341bae371cf3")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
