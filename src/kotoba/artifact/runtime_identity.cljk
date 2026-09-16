@@ -531,8 +531,8 @@
   pair a guest builds by hand can name any offset and length, and one
   reaching past the used bytes resolved -- found by the sanitized fuzz arm
   as a memcpy whose source overlapped string_concat's destination, the
-  next free bytes. Refused once, for every string slot. Windows unchanged
-  (its resolve already ended at the fixed pool)."
+  next free bytes. Refused once, for every string slot. The Windows loader
+  had the same shape (bounded by its fixed pool size) and follows below."
   "412fd84610809c126dbecf1df5c971891ca4e6c59b42c362b88adb8443d4b2cd")
 
 (def windows-loader-source-sha256
@@ -689,8 +689,12 @@
 
   Advanced once more 2026-09-16 alongside the POSIX loader: context ABI v10,
   the same two range slots 336 / 344 (the second a five-parameter SysV
-  function). Cross-compiled, not run."
-  "a3a1de9d398a1f4e0635479e8e820930e4e48cdedd9d55a1f8a5ff9f2655158d")
+  function). Cross-compiled, not run.
+
+  Advanced 2026-09-16 the same hour: resolve_string_bytes bounds a pool
+  range by string_pool_used, as the POSIX loader's does. Cross-compiled,
+  not run."
+  "9f1c5272be6f07b10ac319db24acbc2857d5f0d0cced3665c71be5d979c3801a")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
