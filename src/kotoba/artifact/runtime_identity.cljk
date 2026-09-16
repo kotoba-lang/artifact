@@ -584,8 +584,16 @@
   grant bit is the whole gate. amu's test-package-command checks the
   \"abc\" and empty-string vectors, a 24,576-byte input against node's
   crypto, and the ungranted trap; control with the provider unrouted is
-  red on two."
-  "a78d6d4c70a7dd89f33b8cd1ae06714c133a10e6fa9f549c9211036059a28ef7")
+  red on two.
+
+  Advanced 2026-09-16 once more: wire 35 gains an MTIME form,
+  \"<path>MTIME_SEP\" -> the modification time as seconds since 1970 (\"\"
+  when the path cannot be stat'ed), under the same confinement as STAT. Its
+  own form rather than a fifth STAT field, because org-ieee-du reads STAT's
+  fourth field to the end of the string. amu's test-package-command sets a
+  file's mtime to a known value and reads it back, and the ungranted
+  binary traps; control with the form unrouted is red."
+  "0beec76f467f2a894b4717226e8e04478630d977dcca113eb39d107ce48ea014")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
