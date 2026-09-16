@@ -524,8 +524,16 @@
   Executed by amu's conformance (examples/range-slots.kotoba: 319352, the
   append also over a range of ITSELF; byte 200 refused). Measured on the
   commands, 33 MB: cut -f2 0.19 -> 0.13 s, uniq 0.13 -> 0.10, grep e
-  0.17 -> 0.15, sort 0.66 -> 0.62."
-  "23033c3f7714ce337d7182398bf3f298b3dfdaefc216fc1dd8e352d96233d4b3")
+  0.17 -> 0.15, sort 0.66 -> 0.62.
+
+  Advanced 2026-09-16 the same hour: resolve_string_bytes bounds a pool
+  range by the bytes that EXIST (string_pool_used), not by the budget. A
+  pair a guest builds by hand can name any offset and length, and one
+  reaching past the used bytes resolved -- found by the sanitized fuzz arm
+  as a memcpy whose source overlapped string_concat's destination, the
+  next free bytes. Refused once, for every string slot. Windows unchanged
+  (its resolve already ended at the fixed pool)."
+  "412fd84610809c126dbecf1df5c971891ca4e6c59b42c362b88adb8443d4b2cd")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
