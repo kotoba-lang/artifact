@@ -457,8 +457,19 @@
   validated as canonical UTF-8 before it is read, as every string slot
   here is. Executed by amu's jdk-free-native-conformance
   (examples/text-slots.kotoba): each head's answer in its own decimal
-  place, 21337441, over the operands a wrong host gets wrong."
-  "264d2bdfbdcf9d9dc6d0f7fe1a4e77ae6048da62c626665c222e29359eb9743e")
+  place, 21337441, over the operands a wrong host gets wrong.
+
+  Advanced once more 2026-09-16, the same day: the memmem behind
+  string_index_of (slot 216) was a memcmp at EVERY haystack offset -- a
+  function call per byte, sampled at 54% of a 33 MB sort whose merge asks
+  for the next newline once per line per level. It is now a memchr for the
+  needle's first byte and one memcmp per candidate, the shape the Windows
+  loader already had; one definition on every platform rather than libc's
+  where it exists, so the answer does not depend on the host. Twelve
+  boundary cases (empty needle, needle longer than haystack, match at 0,
+  at the end, first byte repeated before the match) answer as before; the
+  same 33 MB sort went from 10.96 s to 3.09 s user with no other change."
+  "603bde98dfc737e4a64b6f1e9e18d7925f57f319911e25b39f6034bd2a243e5c")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
