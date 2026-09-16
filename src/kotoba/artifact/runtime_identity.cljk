@@ -514,8 +514,18 @@
   ways (examples/inline-handles.kotoba: 4590616 in range, SIGILL out of
   range) -- which is how the first cut's clobbered value register was
   caught. string_compare_lines resolves and validates a string once when
-  both lines are in it. The same 33 MB sort: 0.77 s -> 0.66 s user."
-  "7b7749c1644a7cca291af039e38c1700027c5119595fe9f8ce9db738491965bf")
+  both lines are in it. The same 33 MB sort: 0.77 s -> 0.66 s user.
+
+  Advanced 2026-09-16 once more: context ABI v10 -- two range operations
+  that take no view and mint none, string_find_byte 336 (the first offset
+  at or after a boundary FROM holding the ASCII byte B, 0-127 so a match is
+  a boundary; -1 when none) and string_append_range 344 (ACC followed by
+  bytes [START, END) of S, both boundaries; string_concat's tail append).
+  Executed by amu's conformance (examples/range-slots.kotoba: 319352, the
+  append also over a range of ITSELF; byte 200 refused). Measured on the
+  commands, 33 MB: cut -f2 0.19 -> 0.13 s, uniq 0.13 -> 0.10, grep e
+  0.17 -> 0.15, sort 0.66 -> 0.62."
+  "23033c3f7714ce337d7182398bf3f298b3dfdaefc216fc1dd8e352d96233d4b3")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -667,8 +677,12 @@
   bounds a vector first here. Cross-compiled, not run.
 
   Advanced again 2026-09-16 alongside the POSIX loader: context ABI v9, the
-  same six pointers at 288-328 set once at start. Cross-compiled, not run."
-  "abe8caf45333e2d6a08080d95845e4be114e869a63c4984d5ea16df6de56b324")
+  same six pointers at 288-328 set once at start. Cross-compiled, not run.
+
+  Advanced once more 2026-09-16 alongside the POSIX loader: context ABI v10,
+  the same two range slots 336 / 344 (the second a five-parameter SysV
+  function). Cross-compiled, not run."
+  "a3a1de9d398a1f4e0635479e8e820930e4e48cdedd9d55a1f8a5ff9f2655158d")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
