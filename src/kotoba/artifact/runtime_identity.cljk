@@ -575,8 +575,17 @@
   request traps rather than echoing. amu's test-package-command checks the
   wall answer against the harness clock, monotonic non-regression, the
   unknown-request trap and the ungranted trap; control with the provider
-  unrouted is red on three."
-  "99852af47c0c8bc187644a7e470420429fa98322267dc3675a406023aaff2414")
+  unrouted is red on three.
+
+  Advanced 2026-09-16 once more: wire 3 (:hash/sha256) gets a real provider
+  -- the request bytes' SHA-256 as 64 hex characters (FIPS 180-4, in the
+  loader as mechanism) -- where the switch had fallen through to identity
+  and a guest asking for a digest got its input back. Pure, no scope; the
+  grant bit is the whole gate. amu's test-package-command checks the
+  \"abc\" and empty-string vectors, a 24,576-byte input against node's
+  crypto, and the ungranted trap; control with the provider unrouted is
+  red on two."
+  "a78d6d4c70a7dd89f33b8cd1ae06714c133a10e6fa9f549c9211036059a28ef7")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
