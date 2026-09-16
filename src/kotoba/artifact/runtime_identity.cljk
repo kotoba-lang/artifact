@@ -468,8 +468,22 @@
   where it exists, so the answer does not depend on the host. Twelve
   boundary cases (empty needle, needle longer than haystack, match at 0,
   at the end, first byte repeated before the match) answer as before; the
-  same 33 MB sort went from 10.96 s to 3.09 s user with no other change."
-  "603bde98dfc737e4a64b6f1e9e18d7925f57f319911e25b39f6034bd2a243e5c")
+  same 33 MB sort went from 10.96 s to 3.09 s user with no other change.
+
+  Advanced 2026-09-16 once more: context ABI v8 -- the two line heads as
+  host slots, string_index_of_from 272 (memmem from a boundary FROM in
+  [0, len], ABSOLUTE offset, -1 when none; every line walk had been
+  cutting a view, a handle, to search from an offset) and
+  string_compare_lines 280 (byte order of the newline-terminated line of A
+  at I against the line of B at J; a line ends at the first newline,
+  excluded, or the end; the byte length names the empty line). The second
+  is the first FOUR-argument slot: kotoba-mir carries the fourth in x4 /
+  r8, the loader's fifth C parameter, and amu's jdk-free-native-conformance
+  executes it (examples/line-slots.kotoba, 231132). The write providers'
+  decimal count is written by hand rather than snprintf, a third of a
+  100 ns write. Every operand validated as canonical UTF-8 before it is
+  read, as before."
+  "2a6a5cbc66cc8aeb052e02531f82409282f5fea2c797aa6d5334d06c260d9bc9")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -609,8 +623,12 @@
   arena_enter / arena_leave slots and mark stack, cross-compiled, not run.
 
   Advanced again 2026-09-16 alongside the POSIX loader: context ABI v7, the
-  same four text slots 240-264, cross-compiled, not run."
-  "95095dc9dfbb4c271250054805920f2f23eb3b17e11bc18e56c7924283ab099d")
+  same four text slots 240-264, cross-compiled, not run.
+
+  Advanced once more 2026-09-16 alongside the POSIX loader: context ABI v8,
+  the same two line slots 272 / 280 (the second a five-parameter SysV
+  function), cross-compiled, not run."
+  "d32b1a22e4b59214c73a1fdb8ab17472ed87f88a198e2d18a0c2ddecc415c879")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
