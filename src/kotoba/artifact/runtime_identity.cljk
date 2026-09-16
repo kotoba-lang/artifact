@@ -501,8 +501,21 @@
   accumulator started from a literal had minted unvalidated results at every
   append and the write that read it re-scanned the batch. Measured together
   on org-ieee-sort's index merge sort over 33 MB: 1.11 s -> 0.77 s user,
-  identical to LC_ALL=C sort."
-  "8906860a5757e275dbf1a28ffe33e016c63f4712e5565de8ae5b4f00408d9050")
+  identical to LC_ALL=C sort.
+
+  Advanced 2026-09-16 once more: context ABI v9 (kotoba-native ADR 0084,
+  owner decision) -- six DATA pointers at 288-328 (the pair-used counter,
+  the pair table, the validated flags, the vector-used counter, the vector
+  table, the item arena), written once before the guest starts, through
+  which the compiler emits pair-first / pair-second (string-byte-length) /
+  vector-count / vector-at / vector-assoc! IN LINE with the same range
+  check the checked_* twin makes and udf / ud2 = SIGILL on failure; the
+  slots stay installed. amu's conformance executes the inline path both
+  ways (examples/inline-handles.kotoba: 4590616 in range, SIGILL out of
+  range) -- which is how the first cut's clobbered value register was
+  caught. string_compare_lines resolves and validates a string once when
+  both lines are in it. The same 33 MB sort: 0.77 s -> 0.66 s user."
+  "7b7749c1644a7cca291af039e38c1700027c5119595fe9f8ce9db738491965bf")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -651,8 +664,11 @@
   Advanced again 2026-09-16 alongside the POSIX loader: the per-vector
   length limit 16384 -> 2^24 (kotoba.kir.value/vector-item-limit, osaho
   #93); this loader's item arena stays the fixed 65536 words, so the arena
-  bounds a vector first here. Cross-compiled, not run."
-  "a41c8b4d611ff0594b91986f194e6e32600c07434c4f47700b1eadf6b5d0895c")
+  bounds a vector first here. Cross-compiled, not run.
+
+  Advanced again 2026-09-16 alongside the POSIX loader: context ABI v9, the
+  same six pointers at 288-328 set once at start. Cross-compiled, not run."
+  "abe8caf45333e2d6a08080d95845e4be114e869a63c4984d5ea16df6de56b324")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
