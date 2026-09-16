@@ -592,8 +592,19 @@
   own form rather than a fifth STAT field, because org-ieee-du reads STAT's
   fourth field to the end of the string. amu's test-package-command sets a
   file's mtime to a known value and reads it back, and the ungranted
-  binary traps; control with the form unrouted is red."
-  "0beec76f467f2a894b4717226e8e04478630d977dcca113eb39d107ce48ea014")
+  binary traps; control with the form unrouted is red.
+
+  Advanced 2026-09-16 once more: a wire-35 scope entry that IS /dev/fd
+  means \"the descriptors the caller connected\". `diff <(a) <(b)` hands its
+  operands over as /dev/fd/N, and such a descriptor has no path under any
+  grant (a pipe has none at all -- F_GETPATH fails, measured; an inherited
+  file descriptor's real path is wherever the caller's file is), so the
+  containment check honours that one entry the way wire 41 honours
+  standard input. Without the entry the ordinary containment refuses as
+  before -- amu's test-package-command runs the same guest packaged with
+  and without it (pipe read to EOF, file outside every other grant read,
+  refusal SIGILL); control with the rule disabled is red on two."
+  "f9a27e3848a99fb07bd4354b49685613184dfa15442ec24c33a99283c23d4219")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
