@@ -556,8 +556,16 @@
   head -1`, the most frequent pipeline shape measured, 8,593 calls), not
   a trap. The supervisor re-raises SIGPIPE on itself (141 if raise
   returns) with nothing on stderr, where it had printed KEXE_TRAP
-  :unhandled-child-signal and exited 123."
-  "a1193e6537cafd0d032b0025b120eb0357fa4c22ac7545877284e6ff45bf2252")
+  :unhandled-child-signal and exited 123.
+
+  Advanced 2026-09-16 the same hour: the decimal form of wire 41 answers
+  WHOLE CODE POINTS. A chunk cut at an arbitrary byte could end inside a
+  UTF-8 sequence, and the guest's next validating string operation trapped
+  on the fragment (measured: SIGILL on 日本語 read four bytes at a time).
+  An incomplete trailing sequence -- at most three bytes -- is held back
+  and is the first thing the next answer holds; a request too small to
+  hold one code point is refused rather than answered empty."
+  "8d07c6ac4f290c41b391ca0acea3f506db10e22d757a25b2df4527a6ab2e0920")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
