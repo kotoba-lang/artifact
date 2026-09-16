@@ -532,8 +532,32 @@
   reaching past the used bytes resolved -- found by the sanitized fuzz arm
   as a memcpy whose source overlapped string_concat's destination, the
   next free bytes. Refused once, for every string slot. The Windows loader
-  had the same shape (bounded by its fixed pool size) and follows below."
-  "412fd84610809c126dbecf1df5c971891ca4e6c59b42c362b88adb8443d4b2cd")
+  had the same shape (bounded by its fixed pool size) and follows below.
+
+  Advanced 2026-09-16 once more, for what the commands' CALLERS do
+  (superproject ADR-2609161710; 1,268,018 Bash calls in 558 agent transcripts
+  measured that day). Two changes in one identity:
+
+  Wire 41 (:io/read, kotoba-lang #697): a command's STANDARD INPUT. The
+  empty request answers everything to EOF; a decimal request answers at
+  most that many unread bytes, the empty string at EOF -- one cursor, the
+  descriptor's own. read(2) is handed the string pool's free tail, so the
+  input is copied once by the kernel and never by the loader; input past
+  the pool budget is REFUSED (whole form: a one-byte probe after a full
+  pool traps if it finds a byte) rather than answered short. No scope;
+  Seatbelt does not mediate read(2) on an inherited descriptor (measured
+  under this loader's own profile), so the allow-mask bit is the whole
+  grant and amu's test-package-command runs the same guest with and
+  without it. head/tail/cut/tr/sort/uniq are invoked as a LATER pipeline
+  segment 94-99% of the time; before this wire a command could only be the
+  first.
+
+  SIGPIPE: a child killed by SIGPIPE is the reader leaving (`grep e big |
+  head -1`, the most frequent pipeline shape measured, 8,593 calls), not
+  a trap. The supervisor re-raises SIGPIPE on itself (141 if raise
+  returns) with nothing on stderr, where it had printed KEXE_TRAP
+  :unhandled-child-signal and exited 123."
+  "a1193e6537cafd0d032b0025b120eb0357fa4c22ac7545877284e6ff45bf2252")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
