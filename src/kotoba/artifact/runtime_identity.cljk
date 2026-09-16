@@ -564,8 +564,19 @@
   on the fragment (measured: SIGILL on 日本語 read four bytes at a time).
   An incomplete trailing sequence -- at most three bytes -- is held back
   and is the first thing the next answer holds; a request too small to
-  hold one code point is refused rather than answered empty."
-  "8d07c6ac4f290c41b391ca0acea3f506db10e22d757a25b2df4527a6ab2e0920")
+  hold one code point is refused rather than answered empty.
+
+  Advanced 2026-09-16 once more: wire 7 (:clock/now) gains a TEXT form,
+  \"wall\" -> unix milliseconds and \"monotonic\" -> nanoseconds as decimal
+  text, under the same grant bit as the clock-v1 record form. The record
+  codec is not admitted on the JVM-free native route a packaged command is
+  built by, so a command could not read a clock at all -- the fall-through
+  echoed the request (a guest printed \"wall\", measured). An unknown
+  request traps rather than echoing. amu's test-package-command checks the
+  wall answer against the harness clock, monotonic non-regression, the
+  unknown-request trap and the ungranted trap; control with the provider
+  unrouted is red on three."
+  "99852af47c0c8bc187644a7e470420429fa98322267dc3675a406023aaff2414")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
