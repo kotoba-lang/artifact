@@ -482,8 +482,27 @@
   executes it (examples/line-slots.kotoba, 231132). The write providers'
   decimal count is written by hand rather than snprintf, a third of a
   100 ns write. Every operand validated as canonical UTF-8 before it is
-  read, as before."
-  "2a6a5cbc66cc8aeb052e02531f82409282f5fea2c797aa6d5334d06c260d9bc9")
+  read, as before.
+
+  Advanced 2026-09-16 once more, three things in one loader: (1) the two
+  vector arenas are per-run BUDGETS (KEXE_VECTORS / KEXE_VECTOR_ITEMS, or a
+  packaged command's --vectors / --vector-items; defaults the 4096 / 65536
+  they always were, mmap'd maxima 2^22 handles / 2^27 words, refused above
+  before the guest starts), and the per-vector limit checked at vector-conj
+  / vector-alloc is 2^24, re-derived from kotoba.kir.value/vector-item-limit
+  (osaho #93) -- measured at its boundary by amu's conformance under an
+  arena one word wider than the limit (16777216 admitted, 16777217
+  refused); (2) string_compare_lines compares eight bytes at a time in one
+  pass, a newline in either word ending a line before a difference, instead
+  of two memchr calls and a memcmp -- differentially tested against that
+  reference over 79,524 offset pairs, 0 mismatches; a tab below a newline is
+  why memcmp alone could not answer it; (3) string_concat validates its two
+  inputs (once per handle, the flag) so its result inherits validity -- an
+  accumulator started from a literal had minted unvalidated results at every
+  append and the write that read it re-scanned the batch. Measured together
+  on org-ieee-sort's index merge sort over 33 MB: 1.11 s -> 0.77 s user,
+  identical to LC_ALL=C sort."
+  "8906860a5757e275dbf1a28ffe33e016c63f4712e5565de8ae5b4f00408d9050")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -627,8 +646,13 @@
 
   Advanced once more 2026-09-16 alongside the POSIX loader: context ABI v8,
   the same two line slots 272 / 280 (the second a five-parameter SysV
-  function), cross-compiled, not run."
-  "d32b1a22e4b59214c73a1fdb8ab17472ed87f88a198e2d18a0c2ddecc415c879")
+  function), cross-compiled, not run.
+
+  Advanced again 2026-09-16 alongside the POSIX loader: the per-vector
+  length limit 16384 -> 2^24 (kotoba.kir.value/vector-item-limit, osaho
+  #93); this loader's item arena stays the fixed 65536 words, so the arena
+  bounds a vector first here. Cross-compiled, not run."
+  "a41c8b4d611ff0594b91986f194e6e32600c07434c4f47700b1eadf6b5d0895c")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
