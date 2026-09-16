@@ -445,8 +445,20 @@
   safety argument is the type rule the frontend and the verifier hold the
   body to (:i64 / :bool / :f64). Executed both ways by amu's
   jdk-free-native-conformance under the loader's DEFAULT budgets: the same
-  20,000-iteration loop answers 200000 scoped and traps unscoped."
-  "cb5fffd09a210178320ee0756dc646f41622fcfeb27b94507bee4ab799c5695f")
+  20,000-iteration loop answers 200000 scoped and traps unscoped.
+
+  Advanced again 2026-09-16: context ABI v7 -- the four text heads as host
+  slots, string_compare 240 (memcmp over the common prefix, the shorter
+  first; byte order is code point order for canonical UTF-8),
+  string_fold_ascii 248 (A-Z lowered into a fresh pool string, one byte to
+  one byte so offsets carry back to the original), string_find_blank 256
+  and string_skip_blank 264 (space \\t \\n \\v \\f \\r; FROM must be a
+  boundary in [0, len]; -1 / len when nothing is found). Every operand is
+  validated as canonical UTF-8 before it is read, as every string slot
+  here is. Executed by amu's jdk-free-native-conformance
+  (examples/text-slots.kotoba): each head's answer in its own decimal
+  place, 21337441, over the operands a wrong host gets wrong."
+  "264d2bdfbdcf9d9dc6d0f7fe1a4e77ae6048da62c626665c222e29359eb9743e")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -583,8 +595,11 @@
   string-concat tail append, cross-compiled, not run.
 
   Advanced 2026-09-16 alongside the POSIX loader: context ABI v6, the same
-  arena_enter / arena_leave slots and mark stack, cross-compiled, not run."
-  "d0797792d653aa7ce686aaaf94c5e07762a9ffe031f623e4e0c1341bae371cf3")
+  arena_enter / arena_leave slots and mark stack, cross-compiled, not run.
+
+  Advanced again 2026-09-16 alongside the POSIX loader: context ABI v7, the
+  same four text slots 240-264, cross-compiled, not run."
+  "95095dc9dfbb4c271250054805920f2f23eb3b17e11bc18e56c7924283ab099d")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
