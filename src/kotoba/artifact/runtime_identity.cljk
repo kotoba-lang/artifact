@@ -613,8 +613,23 @@
   developer's PATH is 30-40 entries). amu's test-package-command reads a
   file under a directory that is on PATH only for that run, and the same
   file with PATH not naming its directory traps -- the entry grants PATH,
-  not the world; control with the expansion disabled is red."
-  "00d9f5f57204339c269e8fe431d2c9c613edc3fc1b5ba1b69a6da0d29555d648")
+  not the world; control with the expansion disabled is red.
+
+  Advanced 2026-09-17: a RELATIVE request path resolves against the
+  working directory the command started in (captured once in the parent,
+  before the fork and the sandbox), is normalized lexically (`.`, `..`,
+  repeated slashes), and is then held to the same scope as an absolute
+  one -- resolution before admission, never around it. Measured over
+  1,268,018 agent Bash calls, the file operands of head / tail / sed /
+  grep / wc / cut / sort / cat / awk are relative 99,826 times and absolute
+  17,104; the loader had refused every relative spelling. A scope entry
+  that is literally `$PWD` expands to that directory, on the `$PATH`
+  argument: the caller chose where to run the command. amu's
+  test-package-command runs a guest inside a directory packaged with
+  `$PWD` (relative operand read; `./sub/../sub/x` read; `../sibling/x`
+  traps), with the absolute directory (read), and with a scope elsewhere
+  (traps); control with the join disabled is red on three."
+  "537fa7fbb8afefe5d2b6a212c91239aaf6eac1a6d312ae742d46db4bdcf8d740")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
