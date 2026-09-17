@@ -628,8 +628,19 @@
   test-package-command runs a guest inside a directory packaged with
   `$PWD` (relative operand read; `./sub/../sub/x` read; `../sibling/x`
   traps), with the absolute directory (read), and with a scope elsewhere
-  (traps); control with the join disabled is red on three."
-  "537fa7fbb8afefe5d2b6a212c91239aaf6eac1a6d312ae742d46db4bdcf8d740")
+  (traps); control with the join disabled is red on three.
+
+  Advanced 2026-09-17 once more, before the amu landing consumed the
+  previous pin: a wire-35 APPEND form, "<path>APPEND_SEP<content>",
+  appends to a file that exists (no O_CREAT), same scope, containment and
+  answer as WRITE. Between WRITE_SEP and APPEND_SEP the token that comes
+  EARLIER in the request is the form, the path preceding the content. It
+  is what lets a guest build a file one line at a time when each line is
+  minted inside an arena-scope and cannot leave it as a string (`sed -i`).
+  amu's test-package-command writes empty, appends twice (a content that
+  holds WRITE_SEP), reads back; a missing file traps and nothing is
+  created."
+  "f6aff46c58ee38e9534ad77b662d36307b198d1d578d2b1306bb880de8d4c55e")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
