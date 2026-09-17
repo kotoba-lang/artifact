@@ -639,8 +639,11 @@
   minted inside an arena-scope and cannot leave it as a string (`sed -i`).
   amu's test-package-command writes empty, appends twice (a content that
   holds WRITE_SEP), reads back; a missing file traps and nothing is
-  created."
-  "f6aff46c58ee38e9534ad77b662d36307b198d1d578d2b1306bb880de8d4c55e")
+  created. Consecutive appends to the same file share one descriptor and
+  a 64 KiB buffer (an open, containment check, write and close per line
+  measured 6.3 us a line, SIGXCPU on 769,400 lines); every other wire-35
+  form closes the sink first, and so does the guest's return."
+  "f90ece16a25909bf0a6a26917d5f50778a826268f884a7c0fe03651ff9fa9694")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
