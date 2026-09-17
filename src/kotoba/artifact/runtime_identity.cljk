@@ -631,7 +631,7 @@
   (traps); control with the join disabled is red on three.
 
   Advanced 2026-09-17 once more, before the amu landing consumed the
-  previous pin: a wire-35 APPEND form, "<path>APPEND_SEP<content>",
+  previous pin: a wire-35 APPEND form, \"<path>APPEND_SEP<content>\",
   appends to a file that exists (no O_CREAT), same scope, containment and
   answer as WRITE. Between WRITE_SEP and APPEND_SEP the token that comes
   EARLIER in the request is the form, the path preceding the content. It
