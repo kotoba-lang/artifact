@@ -16,7 +16,7 @@
   prevent. Expected text bytes come from `ascii` below, which is
   `clojure.core/int` over the characters and shares nothing with the encoder."
   (:require [kotoba.lang.text :as string]
-            #?(:clj  [clojure.test :refer [deftest is testing]]
+            #?(:clj  [kotoba.test :refer [deftest is testing]]
                :cljs [cljs.test :refer [deftest is testing] :include-macros true])
             [kotoba.artifact.core :as artifact]
             [kotoba.artifact.descriptor-table :as table]

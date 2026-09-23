@@ -20,7 +20,7 @@
   at runtime, because a test that only asserts `(= (sha256 x) (sha256 x))`
   passes on one host alone and proves nothing about the other. Each host must
   independently reproduce the same literal string."
-  (:require #?(:clj  [clojure.test :refer [deftest is testing]]
+  (:require #?(:clj  [kotoba.test :refer [deftest is testing]]
                :cljs [cljs.test :refer [deftest is testing] :include-macros true])
             [kotoba.artifact.core :as artifact]))
 
