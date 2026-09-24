@@ -642,8 +642,17 @@
   created. Consecutive appends to the same file share one descriptor and
   a 64 KiB buffer (an open, containment check, write and close per line
   measured 6.3 us a line, SIGXCPU on 769,400 lines); every other wire-35
-  form closes the sink first, and so does the guest's return."
-  "f90ece16a25909bf0a6a26917d5f50778a826268f884a7c0fe03651ff9fa9694")
+  form closes the sink first, and so does the guest's return.
+  Advanced 2026-09-25 (superproject adr-2609242330): context ABI v11 -- the
+  string constructor and three bytes slots (string_from_utf8 352,
+  bytes_from_vector 360, bytes_slice 368, bytes_concat 376; a bytes value is
+  a vector-arena handle), the named value traps the supervisor reports
+  (`KEXE_TRAP {:kind :value :reason :utf8/overlong}` ...), and version 11 in
+  every checked_*. This identity also takes in the loader changes amu main
+  made after f90ece16 was pinned (adr-2609242100 P1-P4 and wire 2), which
+  had left it naming a loader that no longer existed: amu main's loader
+  hashed to ad409b71 while this said f90ece16."
+  "287f6037506402a034c00a6cfe09464518221920b36735affc69309c5eab6e88")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
@@ -808,8 +817,12 @@
   Advanced 2026-09-24 (superproject adr-2609242100 P1): KEXE_RECORD_FIELD_LIMIT
   128 -> 32, the record field bound every compiler and runtime enforces
   (kotoba-lang lang/limits.edn :language/static :record-fields). One define;
-  amu tools/kexe_loader_windows.c at amu#1074. Not compiled or run here."
-  "e1c190f157012f0b51622f66dbc66e875bb0f66dbf362d08f78016e78efeb0b7")
+  amu tools/kexe_loader_windows.c at amu#1074. Not compiled or run here.
+  Advanced 2026-09-25 (superproject adr-2609242330): context ABI v11 -- the
+  string constructor and three bytes slots at 352-376, canonical UTF-8 only
+  (a refusal traps, unnamed on this host), version 11 in every check.
+  Cross-compiled (zig, x86-64 and Arm64 PE32+, reproducible), not run."
+  "667418ba74336ab3a0012be4eacf0a9539cb8de242f662cc7617415055e9d716")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
