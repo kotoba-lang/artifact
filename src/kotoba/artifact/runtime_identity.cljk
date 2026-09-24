@@ -803,8 +803,13 @@
 
   Advanced 2026-09-16 the same hour: resolve_string_bytes bounds a pool
   range by string_pool_used, as the POSIX loader's does. Cross-compiled,
-  not run."
-  "9f1c5272be6f07b10ac319db24acbc2857d5f0d0cced3665c71be5d979c3801a")
+  not run.
+
+  Advanced 2026-09-24 (superproject adr-2609242100 P1): KEXE_RECORD_FIELD_LIMIT
+  128 -> 32, the record field bound every compiler and runtime enforces
+  (kotoba-lang lang/limits.edn :language/static :record-fields). One define;
+  amu tools/kexe_loader_windows.c at amu#1074. Not compiled or run here."
+  "e1c190f157012f0b51622f66dbc66e875bb0f66dbf362d08f78016e78efeb0b7")
 
 (defn loader-source-for-profile [profile]
   (case (:os profile)
