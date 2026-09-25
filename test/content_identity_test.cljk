@@ -1,5 +1,5 @@
 (ns content-identity-test
-  (:require #?(:clj  [kotoba.test :refer [deftest is testing]]
+  (:require [kotoba.lang.error :as kerror] [kotoba.bytes :as kbytes] #?(:clj  [kotoba.test :refer [deftest is testing]]
                :cljs [cljs.test :refer [deftest is testing] :include-macros true])
             [ipld.core :as ipld]
             [kotoba.artifact.content-identity :as identity]))
@@ -16,7 +16,7 @@
   two things keeping this file `.clj`. The other was `ipld.link`, which could
   not load under nbb until this repository's io-ipld pin moved past 309db3f."
   [s]
-  #?(:clj (.getBytes ^String s "UTF-8")
+  #?(:clj (kbytes/utf8-bytes ^String s)
      :cljs (.encode (js/TextEncoder.) s)))
 
 
@@ -70,11 +70,11 @@
 
 (deftest identity-envelopes-fail-closed
   (testing "unknown build fields"
-    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+    (is (thrown? kerror/ExceptionInfo
                  (identity/build-cid (assoc build :ambient "ignored")))))
   (testing "source and artifact payloads are bytes"
-    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) (identity/source-cid "source")))
-    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+    (is (thrown? kerror/ExceptionInfo (identity/source-cid "source")))
+    (is (thrown? kerror/ExceptionInfo
                  (identity/artifact-cid
                   {:bytes "ELF" :descriptor {} :definition-cid def-cid
                    :build-cid (identity/build-cid build)})))))
