@@ -671,8 +671,11 @@
   (a trap) instead of followed; and the Linux seccomp filter admits
   openat2, plus mkdirat, unlinkat and renameat for a wire-35 scope, so
   MKDIR / UNLINK / RMDIR / RENAME no longer die with SIGSYS. Decisions and
-  the generated region are unchanged."
-  "9c2bbcee741c56f630538bdc77dba414f42f9c26610895e2c736867d78e4cf6b")
+  the generated region are unchanged. Then 9c2bbcee -> 04ef5b9e the same
+  day: a macOS kernel that ignores O_RESOLVE_BENEATH (macos-14, measured on
+  amu CI) resolves with O_NOFOLLOW_ANY -- no symlink anywhere in the path --
+  instead of trapping every fs open."
+  "04ef5b9e08266c8347aeeb2e1871512e04213a3ede9dba8b31cdb7a0fe14e8ea")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
