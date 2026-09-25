@@ -651,8 +651,19 @@
   every checked_*. This identity also takes in the loader changes amu main
   made after f90ece16 was pinned (adr-2609242100 P1-P4 and wire 2), which
   had left it naming a loader that no longer existed: amu main's loader
-  hashed to ad409b71 while this said f90ece16."
-  "287f6037506402a034c00a6cfe09464518221920b36735affc69309c5eab6e88")
+  hashed to ad409b71 while this said f90ece16.
+  Advanced 2026-09-25 (superproject adr-2609251400 C1): the loader DECISIONS
+  are Kotoba. amu tools/kexe_loader_decisions.kotoba (budget defaults and
+  ceilings, the capability allow-list, the wire id x typed kind -> provider
+  table, result descriptor admission, budget verdicts, scope containment)
+  and tools/kexe_loader_names.kotoba (every trap name) are compiled by amu;
+  their answers and the decisions module machine code for aarch64 and
+  x86_64 are a generated region INSIDE kexe_loader.c, so this one hash still
+  covers everything the loader decides. checked_cap_call answers value + 1
+  wrapping (it was signed overflow at INT64_MAX). amu
+  scripts/test-loader-decisions.cljk drove the 0d244a95 loader and this one
+  with the same cases and got identical answers."
+  "273b97a66831bb3388ec7c0d8de66c250299fbad86a08d490edbdcc13d55f849")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
