@@ -674,8 +674,14 @@
   the generated region are unchanged. Then 9c2bbcee -> 04ef5b9e the same
   day: a macOS kernel that ignores O_RESOLVE_BENEATH (macos-14, measured on
   amu CI) resolves with O_NOFOLLOW_ANY -- no symlink anywhere in the path --
-  instead of trapping every fs open."
-  "04ef5b9e08266c8347aeeb2e1871512e04213a3ede9dba8b31cdb7a0fe14e8ea")
+  instead of trapping every fs open. Then 04ef5b9e -> 1a4f2d95 (2026-09-25,
+  C3 in the loader): the loader embeds the capability handlers' compiled
+  decisions (amu tools/linux_static_handlers.kotoba, the module the Linux
+  static ELF runs) and answers :process/spawn (from its unsandboxed
+  supervisor), :entropy/draw and the :fs/app-data forms fsync,
+  make-temp-dir and stat-nofollow; the Linux seccomp filter admits fchmod,
+  fsync, getrandom and, for the spawn broker, read."
+  "1a4f2d950e7967137e5601e7a89d0d27af2a1dfacbd479431de2920e554c698c")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
