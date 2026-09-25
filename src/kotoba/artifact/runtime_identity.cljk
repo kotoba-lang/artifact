@@ -662,8 +662,17 @@
   covers everything the loader decides. checked_cap_call answers value + 1
   wrapping (it was signed overflow at INT64_MAX). amu
   scripts/test-loader-decisions.cljk drove the 0d244a95 loader and this one
-  with the same cases and got identical answers."
-  "273b97a66831bb3388ec7c0d8de66c250299fbad86a08d490edbdcc13d55f849")
+  with the same cases and got identical answers.
+  Advanced 2026-09-25 (superproject adr-2609251400 C3, the loader's two
+  holes): every :fs/app-data and :fs/browse open is made BENEATH the scope
+  root the candidate was admitted under (op 8 still decides which root) --
+  Linux openat2 RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS, macOS openat with
+  O_RESOLVE_BENEATH -- so a directory symlink out of the scope is refused
+  (a trap) instead of followed; and the Linux seccomp filter admits
+  openat2, plus mkdirat, unlinkat and renameat for a wire-35 scope, so
+  MKDIR / UNLINK / RMDIR / RENAME no longer die with SIGSYS. Decisions and
+  the generated region are unchanged."
+  "9c2bbcee741c56f630538bdc77dba414f42f9c26610895e2c736867d78e4cf6b")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
