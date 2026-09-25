@@ -15,7 +15,7 @@
   mistake -- which is the exact failure the single-encoding rule exists to
   prevent. Expected text bytes come from `ascii` below, which is
   `clojure.core/int` over the characters and shares nothing with the encoder."
-  (:require [kotoba.lang.text :as string]
+  (:require [kotoba.lang.error :as kerror] [kotoba.lang.text :as string]
             #?(:clj  [kotoba.test :refer [deftest is testing]]
                :cljs [cljs.test :refer [deftest is testing] :include-macros true])
             [kotoba.artifact.core :as artifact]
@@ -230,11 +230,11 @@
   (let [good (section [:i64 :string] [{:capability 7 :request-index 0 :result-index 1}])]
     (is (= good (table/validate! good)))
     (testing "index outside the table"
-      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+      (is (thrown? kerror/ExceptionInfo
                    (table/validate!
                     (section [:i64] [{:capability 7 :request-index 0 :result-index 4}])))))
     (testing "one capability with two contracts"
-      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+      (is (thrown? kerror/ExceptionInfo
                    (table/validate!
                     (section [:i64 :string]
                              [{:capability 7 :request-index 0 :result-index 0}
@@ -242,17 +242,17 @@
     (testing "contracts out of capability order -- the same rule one level up,
               and until 2026-09-10 nothing asserted it: deleting the check
               left this whole suite green, which is how it was found"
-      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+      (is (thrown? kerror/ExceptionInfo
                    (table/validate!
                     (section [:i64 :string]
                              [{:capability 9 :request-index 0 :result-index 1}
                               {:capability 7 :request-index 0 :result-index 1}])))))
     (testing "descriptors out of canonical order -- two artifacts would otherwise
               carry the same types under different indices"
-      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+      (is (thrown? kerror/ExceptionInfo
                    (table/validate! (section [:string :i64] [])))))
     (testing "duplicate descriptors"
-      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+      (is (thrown? kerror/ExceptionInfo
                    (table/validate! (section [:i64 :i64] [])))))
     (testing "a descriptor edited without re-encoding: the drift detector"
       ;; Also the shape an encoder mismatch takes -- a verifier whose
@@ -268,16 +268,16 @@
       (let [drifted (assoc good :descriptors [:f64 :string])]
         (is (= (:descriptors drifted) (vec (sort-by pr-str (:descriptors drifted)))))
         (is (= (count (:descriptors good)) (count (:descriptors drifted))))
-        (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) (table/validate! drifted)))))
+        (is (thrown? kerror/ExceptionInfo (table/validate! drifted)))))
     (testing "not a descriptor at all -- rejected before the re-encode, so an
               unencodable entry is refused rather than thrown out of the encoder"
-      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+      (is (thrown? kerror/ExceptionInfo
                    (table/validate! {:format table/format-tag
                                      :descriptors [:i64 :not-a-type]
                                      :contracts []
                                      :bytes-sha256 (artifact/sha256 [])}))))
     (testing "unknown key"
-      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo)
+      (is (thrown? kerror/ExceptionInfo
                    (table/validate! (assoc good :extra 1)))))))
 
 (deftest capability-kit-qualification-is-untouched
