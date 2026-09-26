@@ -680,8 +680,22 @@
   static ELF runs) and answers :process/spawn (from its unsandboxed
   supervisor), :entropy/draw and the :fs/app-data forms fsync,
   make-temp-dir and stat-nofollow; the Linux seccomp filter admits fchmod,
-  fsync, getrandom and, for the spawn broker, read."
-  "1a4f2d950e7967137e5601e7a89d0d27af2a1dfacbd479431de2920e554c698c")
+  fsync, getrandom and, for the spawn broker, read.
+  Advanced 2026-09-26, 1a4f2d95 -> 107c6055 (superproject adr-2609242330,
+  the export boundary codec): a native EXPORT takes and returns :vector-i64,
+  :bytes and [:option :string]. The loader builds each argument from a
+  typed wire token (vi:<i64,...>, b:<hex>, o:some:s:<utf8 hex>) in its own
+  arenas before the fork, against the parameter kinds the caller declares
+  in KEXE_ARG_TYPES; a bare word in a handle slot is refused as
+  :boundary/forged-handle, and the call's arguments are charged against
+  the boundary traversal budget (65536 nodes / 1 MiB, narrowable per run
+  with KEXE_BOUNDARY_NODES / _BYTES). Refusals exit 131 with a named
+  KEXE_TRAP line; the three new result decodings (vector-i64, bytes,
+  option-string) trap as 132..134. Every rule is a third compiled Kotoba
+  module, amu tools/kexe_loader_boundary.kotoba, embedded in the same
+  generated region for both ISAs; C1's and the handlers' bytes are
+  unchanged, and no syscall is added to the seccomp filter."
+  "107c6055e85c568663d1ba9f9d4688b428c41f4d3c3407c77a59c8b09f7c1b75")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
