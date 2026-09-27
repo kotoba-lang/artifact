@@ -701,8 +701,17 @@
   generated region carries): \"<owner uid> <process euid>\" of the final
   component itself, by fstatat AT_SYMLINK_NOFOLLOW beneath the scope, \"\"
   when absent. The euid is read once in main() before the sandbox is
-  installed, so no syscall is added to the seccomp filter."
-  "daa8df69c642c2c29d3900ace79a5095d8590773b0fbe724d6d19616d106a4e1")
+  installed, so no syscall is added to the seccomp filter.
+  Advanced 2026-09-27, daa8df69 -> ac2ed473 (root ADR-2609261900 stage B):
+  native TCP, wires 43..47 (:net/listen accept dial read write), answered as
+  a SUPERVISOR broker -- the supervisor owns every socket and the guest
+  crosses a pipe pair, as for :process/spawn and :gpu/compute. The seccomp
+  filter admits only the pipe read while the broker is active; Seatbelt is
+  unchanged. Every rule (grammar, exact <ipv4>:<port> scopes from
+  KEXE_CAP_RESOURCES_43 / _45, handle range, byte and time bounds, refusal
+  names) is recompiled C1 decisions (amu tools/kexe_loader_decisions.kotoba
+  decide ops 10..18, constants 22..26) in the generated region."
+  "ac2ed4730f7c8394d631be9822eeda1cecf9d9cf0f3e183c17a9a00b839fa39a")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
