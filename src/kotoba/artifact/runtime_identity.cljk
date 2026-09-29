@@ -1,8 +1,19 @@
 (ns kotoba.artifact.runtime-identity
-  {:kotoba/export [admit! identity-sha256 loader-source-for-profile loader-source-sha256 validate! validate-measurement! windows-loader-source-sha256]}
-  (:require [kotoba.artifact.core :as artifact]
-            [kotoba.kir.target :as target]))
+  {:kotoba/export #?(:kotoba [loader-source-sha256 windows-loader-source-sha256]
+                     :default [admit! identity-sha256 loader-source-for-profile loader-source-sha256 validate! validate-measurement! windows-loader-source-sha256])}
+  (:require #?@(:kotoba [] :default [[kotoba.artifact.core :as artifact]
+                                     [kotoba.kir.target :as target]])))
 
+;; The Kotoba reading is the two pinned loader identities. Admission of a
+;; measured runtime (`validate!`, `identity-sha256`, `validate-measurement!`,
+;; `admit!`) walks an EDN runtime map, joins it against `kotoba.kir.target`'s
+;; profile table and hashes the printed value with host crypto: host only.
+
+#?(:kotoba
+(defn loader-source-sha256 [] :string "273b97a66831bb3388ec7c0d8de66c250299fbad86a08d490edbdcc13d55f849"))
+
+#?(:kotoba nil
+   :default
 (def loader-source-sha256
   "Pinned identity of the reviewed POSIX native loader source.
   Includes string_equal/string_concat and the typed string capability
@@ -663,8 +674,13 @@
   wrapping (it was signed overflow at INT64_MAX). amu
   scripts/test-loader-decisions.cljk drove the 0d244a95 loader and this one
   with the same cases and got identical answers."
-  "273b97a66831bb3388ec7c0d8de66c250299fbad86a08d490edbdcc13d55f849")
+  "273b97a66831bb3388ec7c0d8de66c250299fbad86a08d490edbdcc13d55f849"))
 
+#?(:kotoba
+(defn windows-loader-source-sha256 [] :string "667418ba74336ab3a0012be4eacf0a9539cb8de242f662cc7617415055e9d716"))
+
+#?(:kotoba nil
+   :default
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
   Includes the AppContainer denial boundary plus pair-backed string,
@@ -833,23 +849,31 @@
   string constructor and three bytes slots at 352-376, canonical UTF-8 only
   (a refusal traps, unnamed on this host), version 11 in every check.
   Cross-compiled (zig, x86-64 and Arm64 PE32+, reproducible), not run."
-  "667418ba74336ab3a0012be4eacf0a9539cb8de242f662cc7617415055e9d716")
+  "667418ba74336ab3a0012be4eacf0a9539cb8de242f662cc7617415055e9d716"))
 
+#?(:kotoba nil
+   :default
 (defn loader-source-for-profile [profile]
   (case (:os profile)
     :windows windows-loader-source-sha256
     (:linux :macos) loader-source-sha256
-    nil))
+    nil)))
 
+#?(:kotoba nil
+   :default
 (def ^:private fields
   #{:format :target-profile :loader-source-sha256 :loader-binary-sha256
     :compiler-binary-sha256 :compiler-version-sha256
     :assembler-binary-sha256 :linker-binary-sha256
-    :compiler-resource-sha256 :system-header-closure-sha256})
+    :compiler-resource-sha256 :system-header-closure-sha256}))
 
+#?(:kotoba nil
+   :default
 (defn- sha256? [value]
-  (and (string? value) (boolean (re-matches #"[0-9a-f]{64}" value))))
+  (and (string? value) (boolean (re-matches #"[0-9a-f]{64}" value)))))
 
+#?(:kotoba nil
+   :default
 (defn validate! [runtime]
   (when-not (and (map? runtime)
                  (= fields (set (keys runtime)))
@@ -868,11 +892,15 @@
                  (sha256? (:system-header-closure-sha256 runtime)))
     (throw (ex-info "native runtime identity rejected"
                     {:phase :runtime-identity})))
-  runtime)
+  runtime))
 
+#?(:kotoba nil
+   :default
 (defn identity-sha256 [runtime]
-  (artifact/sha256 (validate! runtime)))
+  (artifact/sha256 (validate! runtime))))
 
+#?(:kotoba nil
+   :default
 (defn validate-measurement! [measurement]
   (when-not (and (map? measurement)
                  (= #{:format :runtime} (set (keys measurement)))
@@ -880,8 +908,10 @@
     (throw (ex-info "runtime measurement schema mismatch"
                     {:phase :runtime-identity})))
   (validate! (:runtime measurement))
-  measurement)
+  measurement))
 
+#?(:kotoba nil
+   :default
 (defn admit! [runtime trust]
   (let [identity (identity-sha256 runtime)
         trusted (:trusted-runtime-sha256 trust)
@@ -894,4 +924,4 @@
     (when-not (and (set? trusted) (contains? trusted identity))
       (throw (ex-info "native runtime identity is not trusted"
                       {:phase :trust :runtime-sha256 identity})))
-    {:runtime-sha256 identity :trusted? true}))
+    {:runtime-sha256 identity :trusted? true})))
