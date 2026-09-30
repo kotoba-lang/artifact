@@ -10,7 +10,7 @@
 ;; profile table and hashes the printed value with host crypto: host only.
 
 #?(:kotoba
-(defn loader-source-sha256 [] :string "273b97a66831bb3388ec7c0d8de66c250299fbad86a08d490edbdcc13d55f849"))
+(defn loader-source-sha256 [] :string "daa8df69c642c2c29d3900ace79a5095d8590773b0fbe724d6d19616d106a4e1"))
 
 #?(:kotoba nil
    :default
@@ -713,7 +713,7 @@
   component itself, by fstatat AT_SYMLINK_NOFOLLOW beneath the scope, \"\"
   when absent. The euid is read once in main() before the sandbox is
   installed, so no syscall is added to the seccomp filter."
-  "daa8df69c642c2c29d3900ace79a5095d8590773b0fbe724d6d19616d106a4e1")
+  "daa8df69c642c2c29d3900ace79a5095d8590773b0fbe724d6d19616d106a4e1"))
 
 #?(:kotoba
 (defn windows-loader-source-sha256 [] :string "667418ba74336ab3a0012be4eacf0a9539cb8de242f662cc7617415055e9d716"))
