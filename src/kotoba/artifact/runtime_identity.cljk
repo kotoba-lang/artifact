@@ -1,13 +1,16 @@
 (ns kotoba.artifact.runtime-identity
-  {:kotoba/export #?(:kotoba [loader-source-sha256 windows-loader-source-sha256]
+  {:kotoba/export #?(:kotoba [admit! identity-sha256 loader-source-for-profile loader-source-sha256 measurement-valid? trust-decision valid? validate! validate-measurement! windows-loader-source-sha256]
                      :default [admit! identity-sha256 loader-source-for-profile loader-source-sha256 validate! validate-measurement! windows-loader-source-sha256])}
-  (:require #?@(:kotoba [] :default [[kotoba.artifact.core :as artifact]
-                                     [kotoba.kir.target :as target]])))
+  (:require [kotoba.artifact.core :as artifact]
+            [kotoba.kir.target :as target]))
 
-;; The Kotoba reading is the two pinned loader identities. Admission of a
-;; measured runtime (`validate!`, `identity-sha256`, `validate-measurement!`,
-;; `admit!`) walks an EDN runtime map, joins it against `kotoba.kir.target`'s
-;; profile table and hashes the printed value with host crypto: host only.
+;; The Kotoba reading is the whole module, over :document: the pinned loader
+;; identities, the profile join against `kotoba.kir.target` (whose Kotoba
+;; reading is the same table as a document), `validate!`, the identity hash
+;; (`artifact/sha256`, the hash/sha256 ability over the canonical text),
+;; `validate-measurement!` and the trust gate `admit!`. Nothing here spawns a
+;; process or reads a file: measuring a runtime (hashing the binaries on disk)
+;; is the caller's, and what arrives here is the EDN map it produced.
 
 #?(:kotoba
 (defn loader-source-sha256 [] :string "daa8df69c642c2c29d3900ace79a5095d8590773b0fbe724d6d19616d106a4e1"))
@@ -889,6 +892,170 @@
   (a refusal traps, unnamed on this host), version 11 in every check.
   Cross-compiled (zig, x86-64 and Arm64 PE32+, reproducible), not run."
   "667418ba74336ab3a0012be4eacf0a9539cb8de242f662cc7617415055e9d716"))
+
+;; ---------------------------------------------------------------------------
+;; Kotoba reading: the validators over :document
+
+#?(:kotoba
+   (defn loader-source-for-profile [profile :document] [:option :string]
+     (match-option (document-keyword-value
+                    (option-value-of [:option :document] (document-get profile :os) (document-null)))
+                   [:option :keyword]
+       (none (option-none-of [:option :string]))
+       (some os (case os
+                  :windows (option-some-of [:option :string] (windows-loader-source-sha256))
+                  :linux (option-some-of [:option :string] (loader-source-sha256))
+                  :macos (option-some-of [:option :string] (loader-source-sha256))
+                  (option-none-of [:option :string]))))))
+
+#?(:kotoba
+   (defn- field [m :document k :keyword] :document
+     (option-value-of [:option :document] (document-get m k) (document-null))))
+
+#?(:kotoba
+   (defn- present? [m :document k :keyword] :bool
+     (document-contains m (document-keyword k))))
+
+#?(:kotoba
+   (defn- hex-byte? [b :i64] :bool
+     (or (and (>= b 48) (<= b 57)) (and (>= b 97) (<= b 102)))))
+
+;; (sha256? value): a string of exactly 64 lowercase hex characters.
+#?(:kotoba
+   (defn- sha256? [d :document] :bool
+     (if (= :string (document-kind d))
+       (let [bs (string-to-utf8 (option-value-of [:option :string] (document-string-value d) ""))]
+         (if (= 64 (bytes-count bs))
+           (loop [i 0]
+             (if (>= i 64)
+               true
+               (if (hex-byte? (bytes-at bs i)) (recur (+ i 1)) false)))
+           false))
+       false)))
+
+;; The profile is one of the table's values (whole-map equality, as
+;; `(contains? (set (vals target/profiles)) profile)`).
+#?(:kotoba
+   (defn- known-profile? [profile :document] :bool
+     (let [table (target/profiles)]
+       (loop [i 0]
+         (if (>= i (document-count table))
+           false
+           (if (document-equal? profile
+                                (option-value-of [:option :document]
+                                                 (document-vector-at
+                                                  (option-value-of [:option :document]
+                                                                   (document-map-entry-at table i)
+                                                                   (document-null))
+                                                  1)
+                                                 (document-null)))
+             true
+             (recur (+ i 1))))))))
+
+#?(:kotoba
+   (defn- keyword-is? [d :document k :keyword] :bool
+     (document-equal? d (document-keyword k))))
+
+#?(:kotoba
+   (defn- os-admitted? [profile :document] :bool
+     (or (keyword-is? (field profile :os) :linux)
+         (keyword-is? (field profile :os) :macos)
+         (keyword-is? (field profile :os) :windows))))
+
+#?(:kotoba
+   (defn- loader-matches? [runtime :document] :bool
+     (match-option (loader-source-for-profile (field runtime :target-profile)) [:option :string]
+       (none false)
+       (some expected (document-equal? (document-string expected) (field runtime :loader-source-sha256))))))
+
+#?(:kotoba
+   (defn- runtime-ok? [runtime :document] :bool
+     (and (= :map (document-kind runtime))
+          (= 10 (document-count runtime))
+          (present? runtime :format) (present? runtime :target-profile)
+          (present? runtime :loader-source-sha256) (present? runtime :loader-binary-sha256)
+          (present? runtime :compiler-binary-sha256) (present? runtime :compiler-version-sha256)
+          (present? runtime :assembler-binary-sha256) (present? runtime :linker-binary-sha256)
+          (present? runtime :compiler-resource-sha256) (present? runtime :system-header-closure-sha256)
+          (keyword-is? (field runtime :format) :kotoba.native-runtime/v6)
+          (known-profile? (field runtime :target-profile))
+          (keyword-is? (field (field runtime :target-profile) :execution) :native)
+          (os-admitted? (field runtime :target-profile))
+          (loader-matches? runtime)
+          (sha256? (field runtime :loader-binary-sha256))
+          (sha256? (field runtime :compiler-binary-sha256))
+          (sha256? (field runtime :compiler-version-sha256))
+          (sha256? (field runtime :assembler-binary-sha256))
+          (sha256? (field runtime :linker-binary-sha256))
+          (sha256? (field runtime :compiler-resource-sha256))
+          (sha256? (field runtime :system-header-closure-sha256)))))
+
+#?(:kotoba
+   (defn valid?
+     "RUNTIME passes every check `validate!` makes (a predicate, for callers
+     that must branch: a Kotoba raise cannot be caught)."
+     [runtime :document] :bool
+     (runtime-ok? runtime)))
+
+#?(:kotoba
+   (defn validate! [runtime :document] :document
+     (if (runtime-ok? runtime)
+       runtime
+       (throw (ex-info "native runtime identity rejected" {:phase :runtime-identity})))))
+
+#?(:kotoba
+   (defn identity-sha256 [runtime :document] :string
+     (artifact/sha256 (validate! runtime))))
+
+#?(:kotoba
+   (defn measurement-valid? [measurement :document] :bool
+     (and (= :map (document-kind measurement))
+          (= 2 (document-count measurement))
+          (present? measurement :format)
+          (present? measurement :runtime)
+          (keyword-is? (field measurement :format) :kotoba.runtime-measurement/v1)
+          (runtime-ok? (field measurement :runtime)))))
+
+#?(:kotoba
+   (defn validate-measurement! [measurement :document] :document
+     (if (and (= :map (document-kind measurement))
+              (= 2 (document-count measurement))
+              (present? measurement :format)
+              (present? measurement :runtime)
+              (keyword-is? (field measurement :format) :kotoba.runtime-measurement/v1))
+       (do (validate! (field measurement :runtime))
+           measurement)
+       (throw (ex-info "runtime measurement schema mismatch" {:phase :runtime-identity})))))
+
+#?(:kotoba
+   (defn- in-set? [trust :document k :keyword identity :string] :bool
+     (let [s (field trust k)]
+       (if (= :set (document-kind s))
+         (document-set-contains? s (document-string identity))
+         false))))
+
+#?(:kotoba
+   (defn trust-decision
+     "What `admit!` does with an identity under TRUST: :revoked, :trusted or
+     :untrusted. Revocation wins over trust; native execution is never a
+     trust-on-first-use operation, so an absent trust set is :untrusted."
+     [trust :document identity :string] :keyword
+     (if (in-set? trust :revoked-runtime-sha256 identity)
+       :revoked
+       (if (in-set? trust :trusted-runtime-sha256 identity)
+         :trusted
+         :untrusted))))
+
+#?(:kotoba
+   (defn admit! [runtime :document trust :document] :document
+     (let [identity (identity-sha256 runtime)]
+       (case (trust-decision trust identity)
+         :revoked (throw (ex-info "native runtime identity is revoked"
+                                  {:phase :trust :runtime-sha256 identity}))
+         :trusted (assoc (assoc (document-map) :runtime-sha256 (document-string identity))
+                         :trusted? (document-bool true))
+         (throw (ex-info "native runtime identity is not trusted"
+                         {:phase :trust :runtime-sha256 identity}))))))
 
 #?(:kotoba nil
    :default
