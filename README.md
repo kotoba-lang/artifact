@@ -89,3 +89,13 @@ capability kit is qualified by this: all remain `:native-aot :pending`.**
 ```bash
 kbb -M:test
 ```
+
+## Pure Kotoba: SourceCID
+
+[`src/kotoba/artifact/source_identity.kotoba`](src/kotoba/artifact/source_identity.kotoba)
+computes SourceCID for a guest (root ADR-2610082200 §16): the digest from the
+`hash/sha256` capability over the exact source bytes (a guest declares
+`[:cap/call 3]`) and CIDv1 assembly from `multiformats.cid`
+(kotoba-lang/io-multiformats, pure). BuildCID and ArtifactCID stay in
+`content_identity.cljk`: a general DAG-CBOR encoder needs document traversal the
+language does not have yet (`migration/source-identity-v1.edn`).
