@@ -710,8 +710,14 @@
   unchanged. Every rule (grammar, exact <ipv4>:<port> scopes from
   KEXE_CAP_RESOURCES_43 / _45, handle range, byte and time bounds, refusal
   names) is recompiled C1 decisions (amu tools/kexe_loader_decisions.kotoba
-  decide ops 10..18, constants 22..26) in the generated region."
-  "ac2ed4730f7c8394d631be9822eeda1cecf9d9cf0f3e183c17a9a00b839fa39a")
+  decide ops 10..18, constants 22..26) in the generated region.
+  Advanced 2026-10-10, ac2ed473 -> 67d66c3d (superproject adr-2610092340
+  D12, amu 0b9a24dac): native gas, context ABI v12 -- `uint64_t gas` at
+  offset 384, metered by KEXE_GAS, exhaustion reported as the budget trap
+  :budget/gas (trap line 43) and a metered report carrying :gas. Every offset
+  below 384 is unchanged, so a v11 artifact runs as before, and an unmetered
+  run's report is byte-identical. The Windows loader did not move."
+  "67d66c3dd8aabcc81d301d9c44be23b590f3df5b2d75924e6b5ba78759308bfa")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
