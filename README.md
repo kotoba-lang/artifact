@@ -99,3 +99,15 @@ computes SourceCID for a guest (root ADR-2610082200 §16): the digest from the
 (kotoba-lang/io-multiformats, pure). BuildCID and ArtifactCID stay in
 `content_identity.cljk`: a general DAG-CBOR encoder needs document traversal the
 language does not have yet (`migration/source-identity-v1.edn`).
+
+## Native target profile qualification
+
+The POSIX profile reviewed on 2026-10-10 restores exact-file grants in AMU's
+loader: the named file is opened without symlink traversal, while siblings
+and ungranted symlink spellings remain refused. Directory grants retain
+beneath-resolution and opened-fd containment. AMU's `test-loader-file-scope`
+executes these four cases on Linux and macOS; CLI signed native execution
+additionally checks the measured source/binary identity against this owner.
+The neutral execution contract carries a profile binding, not this loader
+hash. A changed loader requires a new measured runtime identity and explicit
+trust; an old identity is not silently accepted under the new profile.

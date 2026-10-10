@@ -716,8 +716,15 @@
   offset 384, metered by KEXE_GAS, exhaustion reported as the budget trap
   :budget/gas (trap line 43) and a metered report carrying :gas. Every offset
   below 384 is unchanged, so a v11 artifact runs as before, and an unmetered
-  run's report is byte-identical. The Windows loader did not move."
-  "67d66c3dd8aabcc81d301d9c44be23b590f3df5b2d75924e6b5ba78759308bfa")
+  run's report is byte-identical. The Windows loader did not move.
+  Advanced 2026-10-10, 67d66c3d -> 236ee311 (AMU exact-file profile
+  repair): a grant naming one canonical file opens that exact path without
+  following any symlink component. It does not become a parent-directory
+  grant. Descendants retain beneath-resolution and opened-fd containment;
+  siblings and ungranted symlink spellings are refused. Context ABI v12 and
+  the Windows loader are unchanged. Existing runtime trust must be reissued
+  for the new measured source and binary identity."
+  "236ee3117e6ac3f3ae1966cae244984f957fb8d5e2e3d2c475059667f825e19d")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
