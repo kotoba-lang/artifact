@@ -21,9 +21,13 @@
         io.github.kotoba-lang/io-multiformats {:git/sha "a6ee141708207e990f4268b53a22a85c06b1f69a"}
         io.github.kotoba-lang/io-ipld
         {:git/sha "a6601e49c5d916e1dd4fc915dbef6718e7458742"}
+        ;; osaho at a .cljk main (2026-10-10). The old pin a54916b carried
+        ;; src/kotoba/kir.cljc, which shadowed a newer osaho's kir.cljk for
+        ;; every repository that took osaho through this one (kotoba-sema's
+        ;; `kbb -Spath` classpath among them).
         io.github.kotoba-lang/osaho
         {:git/url "https://github.com/kotoba-lang/osaho.git"
-         :git/sha "a54916bca005f9df5419190c6506d44adcd0311e"}}
+         :git/sha "0c95a32930ab7009bb48728b286bda05a5b972ac"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {io.github.cognitect-labs/test-runner
                                {:git/url "https://github.com/cognitect-labs/test-runner.git"
