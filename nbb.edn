@@ -3,6 +3,15 @@
 ;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
 {:paths ["src" "resources"]
  :deps {
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+        io.github.kotoba-lang/io-multiformats {:git/sha "a6ee141708207e990f4268b53a22a85c06b1f69a"}
+        io.github.kotoba-lang/io-ipld {:git/sha "a6601e49c5d916e1dd4fc915dbef6718e7458742"}
+        io.github.kotoba-lang/osaho {:git/url "https://github.com/kotoba-lang/osaho.git"
+         :git/sha "0c95a32930ab7009bb48728b286bda05a5b972ac"}
+
+        io.github.kotoba-lang/kotoba-core-contracts {:git/url "https://github.com/kotoba-lang/kotoba-core-contracts.git" :git/sha "00cfa8e29aaa3408e6594c6a55fd46867acc8bfd"}
+        io.github.kotoba-lang/abi {:git/url "https://github.com/kotoba-lang/abi.git" :git/sha "4e67b6fabc9e8584cb127fdb71b3fc47e2eadc59"}
+
         ;; kotoba.lang.error replaced clojure.lang.ExceptionInfo here (2026-09-25).
         ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/error {:git/sha "838dec56c9a5b74f9eec825a2fb28bda157f8cd3"}
