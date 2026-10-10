@@ -111,3 +111,9 @@ additionally checks the measured source/binary identity against this owner.
 The neutral execution contract carries a profile binding, not this loader
 hash. A changed loader requires a new measured runtime identity and explicit
 trust; an old identity is not silently accepted under the new profile.
+
+## Explicit v2 execution
+
+See [execution v2](docs/execution-v2.md) and [owner contract](spec/execution-v2.edn).
+New target bindings, authority-issued invocation/leases and authenticated admission
+are explicit APIs; existing v1 runtime defaults remain compatible.
