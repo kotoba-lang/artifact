@@ -1,5 +1,13 @@
 {:paths ["src" "resources"]
  :deps {
+        ;; V2 content blocks depend inward on neutral shapes and outward on
+        ;; the physical profile vocabulary, never on an engine or compiler.
+        io.github.kotoba-lang/kotoba-core-contracts
+        {:git/url "https://github.com/kotoba-lang/kotoba-core-contracts.git"
+         :git/sha "00cfa8e29aaa3408e6594c6a55fd46867acc8bfd"}
+        io.github.kotoba-lang/abi
+        {:git/url "https://github.com/kotoba-lang/abi.git"
+         :git/sha "4e67b6fabc9e8584cb127fdb71b3fc47e2eadc59"}
         ;; kotoba.lang.error replaced clojure.lang.ExceptionInfo here (2026-09-25).
         ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
         io.github.kotoba-lang/error {:git/sha "838dec56c9a5b74f9eec825a2fb28bda157f8cd3"}
