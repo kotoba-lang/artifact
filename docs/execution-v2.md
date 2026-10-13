@@ -16,3 +16,10 @@ at the same basis; replay or a second intent for the same invocation is denied.
 The v2 path is explicit. V1 descriptors, WIT, hashing, signatures and default
 CLI admission remain compatible. Content verification is not authorization;
 fixture coverage and main integration do not establish Q9 or production readiness.
+
+## POSIX loader transport identity
+
+The reviewed loader SHA now includes explicit unary i64 host transport framing.
+The signed runtime identity binds the reviewed loader source and reproduced binary.
+It grants no scope or lease authority: Kototama authenticates and reserves each use,
+and kototama-native owns the process transport. Windows loader identity is unchanged.
