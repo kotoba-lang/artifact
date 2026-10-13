@@ -7,4 +7,6 @@
   :tier :t0
   :role :contract
   :must-not [:produce-artifacts :own-KIR :decide-policy :verify-that-is-kotoba-verifier-]
-  :depends-on ["kotoba-lang/kotoba-kir"]}}
+  :depends-on ["kotoba-lang/osaho"
+               "kotoba-lang/kotoba-core-contracts"
+               "kotoba-lang/abi"]}}
