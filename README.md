@@ -82,7 +82,9 @@ capability kit is qualified by this: all remain `:native-aot :pending`.**
 
 ## Depends on
 
-- `kotoba-lang/kotoba-kir`
+- `kotoba-lang/osaho` (formerly kotoba-kir)
+- `kotoba-lang/kotoba-core-contracts`
+- `kotoba-lang/abi`
 
 ## Test
 
