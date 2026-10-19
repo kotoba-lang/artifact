@@ -5,6 +5,12 @@
 
 (def loader-source-sha256
   "Pinned identity of the reviewed POSIX native loader source.
+  Advanced a third time 2026-10-19 (same series): the non-AArch64 path of
+  the siginfo handler no longer leaves its info parameter unused -- the
+  executor dependency scan compiles the loader with -Wall -Wextra -Werror and
+  rejected it on x86_64. Both arches now compile clean under -Werror. No
+  report shape or floor moved.
+
   Advanced again 2026-10-19 (same series): the named-trap decode hardened
   to AArch64 and to the guest code window -- decoding arbitrary x86 bytes as
   a value-trap code minted spurious reasons, and reading si_addr outside the
@@ -737,7 +743,7 @@
   siblings and ungranted symlink spellings are refused. Context ABI v12 and
   the Windows loader are unchanged. Existing runtime trust must be reissued
   for the new measured source and binary identity."
-  "c8d39b4148af7aaf6bfed3fc2a1e1ebbb82466e57964b00cd846f40dec76f2d2")
+  "a1a32ac0bd6907652733610c7c7d7fd29a2daaed56d2dcfeb4ed57868f2ac994")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
