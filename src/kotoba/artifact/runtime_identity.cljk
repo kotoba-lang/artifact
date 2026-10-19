@@ -5,6 +5,11 @@
 
 (def loader-source-sha256
   "Pinned identity of the reviewed POSIX native loader source.
+  Advanced again 2026-10-19 (same series): the named-trap decode hardened
+  to AArch64 and to the guest code window -- decoding arbitrary x86 bytes as
+  a value-trap code minted spurious reasons, and reading si_addr outside the
+  mapped window could fault in the handler. No report shape or floor moved.
+
   Advanced 2026-10-19: the loader names the value traps an inline refusal
   can carry -- SIGILL/SIGTRAP decode the brk/udf immediate (issue #785) and
   value trap names 12/13 (vector/index-out-of-range, vector/invalid-handle)
@@ -732,7 +737,7 @@
   siblings and ungranted symlink spellings are refused. Context ABI v12 and
   the Windows loader are unchanged. Existing runtime trust must be reissued
   for the new measured source and binary identity."
-  "8308d36074b41882b5817a95b985a69e9a573dddee4a166be42a7c521ed64686")
+  "c8d39b4148af7aaf6bfed3fc2a1e1ebbb82466e57964b00cd846f40dec76f2d2")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
