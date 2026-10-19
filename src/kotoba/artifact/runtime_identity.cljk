@@ -5,6 +5,14 @@
 
 (def loader-source-sha256
   "Pinned identity of the reviewed POSIX native loader source.
+  Advanced 2026-10-19: the loader names the value traps an inline refusal
+  can carry -- SIGILL/SIGTRAP decode the brk/udf immediate (issue #785) and
+  value trap names 12/13 (vector/index-out-of-range, vector/invalid-handle)
+  join the table; checked_vector_at records 12/13 on its failure paths.
+  Verified end-to-end: an out-of-bounds bytes-at reports
+  {:kind :value :reason :vector/index-out-of-range} instead of a signal-only
+  trap, and the in-bounds path is unchanged.
+
   Includes string_equal/string_concat and the typed string capability
   callback, which validates pair-backed pointer/length handles and canonical
   UTF-8 before and after the provider boundary.
@@ -724,7 +732,7 @@
   siblings and ungranted symlink spellings are refused. Context ABI v12 and
   the Windows loader are unchanged. Existing runtime trust must be reissued
   for the new measured source and binary identity."
-  "b9971c69ebdbe88d8c0f5d6dfd7b186b1bc4a9b838db9328e3f85dbb1b315f37")
+  "8308d36074b41882b5817a95b985a69e9a573dddee4a166be42a7c521ed64686")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
