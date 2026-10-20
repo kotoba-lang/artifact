@@ -5,6 +5,17 @@
 
 (def loader-source-sha256
   "Pinned identity of the reviewed POSIX native loader source.
+  Advanced 2026-10-21 (amu #1421): the fs READ provider is heap-free -- the
+  file is read straight into the string pool, the bytes intern_utf8 would
+  copy into anyway, with the same budget refusal. The sandbox admits no mmap,
+  so the malloc'd buffer faulted SIGSYS where the allocator would map. And
+  the O_CLOEXEC opens on the sandboxed Linux paths use raw openat: musl's
+  open() adds fcntl(F_SETFD, FD_CLOEXEC) whenever O_CLOEXEC is set and fcntl
+  is deliberately outside the allowlist, which trapped the descendant
+  (directory-grant) branch at its first call. openat sets O_CLOEXEC
+  atomically; no allowlist surface moved. Both measured node-free in the
+  guest VM (boot68/71): every fs grant shape completes EXISTS/WRITE/APPEND/
+  READ. fuzz floors unchanged (floorsLowered false).
   Advanced a third time 2026-10-19 (same series): the non-AArch64 path of
   the siginfo handler no longer leaves its info parameter unused -- the
   executor dependency scan compiles the loader with -Wall -Wextra -Werror and
@@ -743,7 +754,7 @@
   siblings and ungranted symlink spellings are refused. Context ABI v12 and
   the Windows loader are unchanged. Existing runtime trust must be reissued
   for the new measured source and binary identity."
-  "a1a32ac0bd6907652733610c7c7d7fd29a2daaed56d2dcfeb4ed57868f2ac994")
+  "82c8af4990c6e410645276ae1b3ccdd30216c87594026d9de0e2a2668a28493c")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
