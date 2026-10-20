@@ -5,6 +5,11 @@
 
 (def loader-source-sha256
   "Pinned identity of the reviewed POSIX native loader source.
+  Advanced again 2026-10-21 (same series): the heap-free read probes one
+  byte at the exact pool ceiling before refusing -- a file whose size
+  equals the remaining capacity fits (intern_utf8 accepted equality), and
+  an empty file is fine even when the pool is full (review P2 on amu
+  #1422). No report shape or floor moved.
   Advanced 2026-10-21 (amu #1421): the fs READ provider is heap-free -- the
   file is read straight into the string pool, the bytes intern_utf8 would
   copy into anyway, with the same budget refusal. The sandbox admits no mmap,
@@ -754,7 +759,7 @@
   siblings and ungranted symlink spellings are refused. Context ABI v12 and
   the Windows loader are unchanged. Existing runtime trust must be reissued
   for the new measured source and binary identity."
-  "82c8af4990c6e410645276ae1b3ccdd30216c87594026d9de0e2a2668a28493c")
+  "bc1beeaa39e10a7e8d548357f46f45eaacfdeb95b91512acab36f642777d000c")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
