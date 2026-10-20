@@ -764,7 +764,7 @@
   siblings and ungranted symlink spellings are refused. Context ABI v12 and
   the Windows loader are unchanged. Existing runtime trust must be reissued
   for the new measured source and binary identity."
-  "e62956bb8ab6c2bdf0b0754a32508347e209642b394108e7a36b77766181a1fc")
+  "daa3c2d7db70a92771b9efd69ff67add5b3d340ca11e7077071e0c28b3633e58")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
