@@ -5,6 +5,11 @@
 
 (def loader-source-sha256
   "Pinned identity of the reviewed POSIX native loader source.
+  Advanced 2026-10-21 (same series): the fs BROWSE provider is heap-free --
+  the entry array and names live in static buffers and the listing goes
+  straight into the string pool (the browse mallocs died SIGSYS where the
+  allocator maps, measured boot88). Over-cap is an honest refusal. No
+  report shape or floor moved.
   Advanced again 2026-10-21 (same series): the heap-free read probes one
   byte at the exact pool ceiling before refusing -- a file whose size
   equals the remaining capacity fits (intern_utf8 accepted equality), and
@@ -759,7 +764,7 @@
   siblings and ungranted symlink spellings are refused. Context ABI v12 and
   the Windows loader are unchanged. Existing runtime trust must be reissued
   for the new measured source and binary identity."
-  "bc1beeaa39e10a7e8d548357f46f45eaacfdeb95b91512acab36f642777d000c")
+  "e62956bb8ab6c2bdf0b0754a32508347e209642b394108e7a36b77766181a1fc")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
