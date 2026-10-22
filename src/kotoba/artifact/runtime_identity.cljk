@@ -763,8 +763,15 @@
   grant. Descendants retain beneath-resolution and opened-fd containment;
   siblings and ungranted symlink spellings are refused. Context ABI v12 and
   the Windows loader are unchanged. Existing runtime trust must be reissued
-  for the new measured source and binary identity."
-  "60ed80d5662e09a945b19fda79b729887163c321c203c98d358e95780f47fa92")
+  for the new measured source and binary identity.
+  Advanced 2026-10-22, 60ed80d5 -> d21ddf03 (the merged amu loader): the
+  loader on amu main after PR #1427 merges carries BOTH lines -- the
+  :http/post provider and its review fixes (amu #1427) and the
+  KEXE_GPU_METAL backend selection wiring (amu #1404 series). Measured as
+  the sha256 of tools/kexe_loader.c on the amu merge of #1427 into main,
+  so this pin supersedes 60ed80d5 (artifact #73's measurement) and the
+  draft 3e0f1a19 line (artifact #74). No report shape or floor moved."
+  "d21ddf0396da35799702f88c90838d8c79d770458671361847fe237cce8f6f3f")
 
 (def windows-loader-source-sha256
   "Pinned identity of the reviewed Windows native loader source.
